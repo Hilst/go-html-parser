@@ -1,0 +1,22 @@
+{{ define "LAYOUT-ITEMS" }}
+<style>
+    .primary {
+        font-size: large;
+        font-weight: bold;
+        color: blue;
+    }
+    .secondary {
+        font-size: medium;
+        font-weight: bold;
+        color: aqua;
+    }
+    .cancel {
+        font-size: medium;
+        font-weight: bold;
+        color: red;
+    }
+</style>
+    {{ range .Items }}
+        {{ template "ITEM" . }}
+    {{ end }}
+{{ end }}
