@@ -1,6 +1,17 @@
-<p>ANTES</p>
 {{ prepare "/items" "ITEMS" "ARRAY" . }}
-{{range $i, $item := array "var:ITEMS" }}
-    <p>{{ $item }}</p>
+{{ range $i, $item := array "var:ITEMS" }}
+    {{ prepare "/title" (printf "ITEM_%d_TITLE" $i) "STRING" $item }}
+    {{ prepare "/description" (printf "ITEM_%d_DESCRIPTION" $i) "STRING" $item }}
+    {{ prepare "/type" (printf "ITEM_%d_TYPE" $i) "STRING" $item }}
 {{end}}
-<p>PASSOU</p>
+
+<ul>
+    {{ range $i, $a := array "var:ITEMS" }}
+        {{$tt := string (printf "var:ITEM_%d_TITLE" $i)}}
+        {{$ds := string (printf "var:ITEM_%d_DESCRIPTION" $i)}}
+        {{$tp := string (printf "var:ITEM_%d_TYPE" $i)}}
+        <li>
+            {{ template "ITEM" (props $tt $ds $tp)}}
+        </li>
+    {{ end }}
+</ul>

@@ -16,8 +16,10 @@ func main() {
 	dataMap := NewDataMap(data)
 
 	varFuncMap := HTMLtmpl.FuncMap{
+		"props":   props,
 		"prepare": dataMap.Prepare,
 		"array":   dataMap.Array,
+		"string":  dataMap.String,
 	}
 
 	// GET LAYOUT HTML AS STRING
@@ -28,4 +30,8 @@ func main() {
 	all.New("LAYOUT").Funcs(varFuncMap).Parse(layout)
 	// BUILD LAYOUT INTO OUTPUT
 	all.ExecuteTemplate(os.Stdout, "MAIN", data)
+}
+
+func props(els ...any) []any {
+	return els
 }

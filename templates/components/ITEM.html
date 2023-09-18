@@ -1,6 +1,9 @@
 {{ define "ITEM" }}
+    {{ $strTitle := index . 0 }}
+    {{ $strDesc := index . 1 }}
+    {{ $strType := index . 2 }}
 <div>
-    <h2>{{ .Title }}</h2>
-    <p class="{{ .Type }}">{{ .Description }}</p>
+    <h2>{{ $strTitle }}</h2>
+    <p class="{{ $strType }}">{{ $strDesc }}</p>
 </div>
 {{ end }}
