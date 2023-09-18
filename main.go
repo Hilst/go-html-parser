@@ -21,4 +21,5 @@ func main() {
 	all.New("LAYOUT").Parse(layout)
 	// BUILD LAYOUT INTO OUTPUT
 	all.ExecuteTemplate(os.Stdout, "MAIN", data)
+	println(data)
 }
