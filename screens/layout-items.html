@@ -1,20 +1,6 @@
-<style>
-    .primary {
-        font-size: large;
-        font-weight: bold;
-        color: blue;
-    }
-    .secondary {
-        font-size: medium;
-        font-weight: bold;
-        color: aqua;
-    }
-    .cancel {
-        font-size: medium;
-        font-weight: bold;
-        color: red;
-    }
-</style>
-{{ range .Items }}
-    {{ template "ITEM" . }}
-{{ end }}
+<p>ANTES</p>
+{{ prepare "/items" "ITEMS" "ARRAY" . }}
+{{range $i, $item := array "var:ITEMS" }}
+    <p>{{ $item }}</p>
+{{end}}
+<p>PASSOU</p>
