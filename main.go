@@ -6,30 +6,25 @@ import (
 	"os"
 )
 
-type (
-	Data struct {
-		Items []Item
-	}
-	Item struct {
-		Title       string
-		Description string
-		Type        string
-	}
-)
-
 func main() {
-	data := Data{
-		[]Item{
-			{"A", "a", "primary"},
-			{"B", "b", "secondary"},
-			{"C", "c", "cancel"},
-		},
+	// DECLARE SERVICE
+	service := Service{
+		dataPath:   "./mocks/",
+		layoutPath: "./screens/",
 	}
+	// GET DATA JSON
+	data := service.RequestData("zero.json")
+	// GET LAYOUT HTML AS STRING
+	layout := service.RequestLayout("layout-items.html")
+	// READ BASE ALL TEMPLATES
 	all := HTMLtmpl.Must(HTMLtmpl.New("ALL").ParseGlob("./templates/**/*.html"))
-	println(all.DefinedTemplates())
+	// ADD LAYOUT TEMPLATE FROM STRING
+	all.New("LAYOUT").Parse(layout)
+	// BUILD LAYOUT INTO OUTPUT
 	all.ExecuteTemplate(os.Stdout, "MAIN", data)
 }
 
+// SERVICE
 type IService interface {
 	RequestData(path string) map[string]interface{}
 	RequestLayout(layoutName string) string
