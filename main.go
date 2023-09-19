@@ -30,32 +30,14 @@ func main() {
 		"mask":   mask,
 	}
 
-	// // GET LAYOUT HTML AS STRING
-	// layout := service.RequestLayout("layout-items.html")
-	// // READ BASE ALL TEMPLATES
-	// all := HTMLtmpl.Must(HTMLtmpl.New("ALL").ParseGlob("./templates/**/*.html"))
-	// // ADD LAYOUT TEMPLATE FROM STRING
-	// all.New("LAYOUT").Funcs(varFuncMap).Parse(layout)
-	// // BUILD LAYOUT INTO OUTPUT
-	// all.ExecuteTemplate(os.Stdout, "MAIN", data)
-	text := `
-	{{- 
-		get "/relatives" . | 
-		array | 
-		where "/relation_title_id" "1" |
-		get "/relative_document_number" |
-		string |
-		mask "##.###.###-#" 
-	-}}`
-	t :=
-		HTMLtmpl.
-			Must(
-				HTMLtmpl.
-					New("some").
-					Funcs(varFuncMap).
-					Parse(text))
-
-	t.ExecuteTemplate(os.Stdout, "some", data)
+	// GET LAYOUT HTML AS STRING
+	layout := service.RequestLayout("layout-items.html")
+	// READ BASE ALL TEMPLATES
+	all := HTMLtmpl.Must(HTMLtmpl.New("ALL").ParseGlob("./templates/**/*.html"))
+	// ADD LAYOUT TEMPLATE FROM STRING
+	all.New("LAYOUT").Funcs(varFuncMap).Parse(layout)
+	// BUILD LAYOUT INTO OUTPUT
+	all.ExecuteTemplate(os.Stdout, "MAIN", data)
 }
 
 func props(els ...any) []any {
