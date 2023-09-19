@@ -7,17 +7,17 @@
         {
             "relation_title_id": 1,
             "relative_name": "Jane Doe",
-            "relative_document_number": "9876543210"
+            "relative_document_number": "987654321"
         },
         {
             "relation_title_id": 2,
             "relative_name": "Alice Doe",
-            "relative_document_number": "5678901234"
+            "relative_document_number": "567890123"
         },
         {
             "relation_title_id": 3,
             "relative_name": "Bob Doe",
-            "relative_document_number": "3456789012"
+            "relative_document_number": "345678901"
         }
     ],
     "supported_actions": [
