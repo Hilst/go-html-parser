@@ -1,17 +1,10 @@
-{{ prepare "/items" "ITEMS" "ARRAY" . }}
-{{ range $i, $item := array "var:ITEMS" }}
-    {{ prepare "/title" (printf "ITEM_%d_TITLE" $i) "STRING" $item }}
-    {{ prepare "/description" (printf "ITEM_%d_DESCRIPTION" $i) "STRING" $item }}
-    {{ prepare "/type" (printf "ITEM_%d_TYPE" $i) "STRING" $item }}
-{{end}}
-
-<ul>
-    {{ range $i, $a := array "var:ITEMS" }}
-        {{$tt := string (printf "var:ITEM_%d_TITLE" $i)}}
-        {{$ds := string (printf "var:ITEM_%d_DESCRIPTION" $i)}}
-        {{$tp := string (printf "var:ITEM_%d_TYPE" $i)}}
-        <li>
-            {{ template "ITEM" (props $tt $ds $tp)}}
-        </li>
+{{ if $items := get "/items" . }}
+    {{ range array $items }}
+        {{ $t := get "/title" . | string }}
+        {{ $d := get "/description" . | string }}
+        {{ $tp := get "/type" . | string }}
+        {{ template "ITEM" props $t $d $tp }}
     {{ end }}
-</ul>
+{{ else }}
+    <h2>Could not retrieve items</h2>
+{{ end }}

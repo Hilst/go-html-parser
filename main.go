@@ -1,8 +1,9 @@
 package main
 
 import (
-	HTMLtmpl "html/template"
-	"os"
+	"bytes"
+	"html/template"
+	"log"
 	"strconv"
 
 	"github.com/qri-io/jsonpointer"
@@ -18,10 +19,10 @@ func main() {
 		dataPath:   "./mocks/",
 		layoutPath: "./screens/",
 	}
-	// GET DATA JSON
-	data = service.RequestData("data.json")
+	// GET DATA
+	data = service.RequestData("zero.json")
 
-	varFuncMap := HTMLtmpl.FuncMap{
+	varFuncMap := template.FuncMap{
 		"props":  props,
 		"get":    get,
 		"string": stringfy,
@@ -33,11 +34,15 @@ func main() {
 	// GET LAYOUT HTML AS STRING
 	layout := service.RequestLayout("layout-items.html")
 	// READ BASE ALL TEMPLATES
-	all := HTMLtmpl.Must(HTMLtmpl.New("ALL").ParseGlob("./templates/**/*.html"))
+	all := template.Must(template.New("ALL").ParseGlob("./templates/**/*.html"))
 	// ADD LAYOUT TEMPLATE FROM STRING
 	all.New("LAYOUT").Funcs(varFuncMap).Parse(layout)
-	// BUILD LAYOUT INTO OUTPUT
-	all.ExecuteTemplate(os.Stdout, "MAIN", data)
+	// EXECUTE LAYOUT
+	tpl := bytes.Buffer{}
+	if err := all.ExecuteTemplate(&tpl, "MAIN", data); err != nil {
+		log.Fatalln(err)
+	}
+	println(tpl.String())
 }
 
 func props(els ...any) []any {
@@ -68,13 +73,11 @@ func stringfy(el any) string {
 	}
 	return el.(string)
 }
-
 func array(parr any) []any {
 	return parr.([]any)
 }
 
 // WHERE
-
 func where(path string, comp any, array []any) any {
 	for _, item := range array {
 		base := get(path, item)
