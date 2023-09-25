@@ -7,6 +7,8 @@ import (
 	"strconv"
 
 	"github.com/qri-io/jsonpointer"
+	"github.com/tdewolff/minify/v2"
+	minifyHTML "github.com/tdewolff/minify/v2/html"
 )
 
 type JSON = map[string]any
@@ -38,11 +40,20 @@ func main() {
 	// ADD LAYOUT TEMPLATE FROM STRING
 	all.New("LAYOUT").Funcs(varFuncMap).Parse(layout)
 	// EXECUTE LAYOUT
-	tpl := bytes.Buffer{}
-	if err := all.ExecuteTemplate(&tpl, "MAIN", data); err != nil {
+	tpl := bytes.NewBuffer([]byte{})
+	if err := all.ExecuteTemplate(tpl, "MAIN", data); err != nil {
 		log.Fatalln(err)
 	}
-	println(tpl.String())
+
+	// MINIFY
+	m := minify.New()
+	m.AddFunc("text/html", minifyHTML.Minify)
+
+	mini := bytes.NewBuffer([]byte{})
+	if err := m.Minify("text/html", mini, tpl); err != nil {
+		log.Fatalln(err)
+	}
+	println(mini.String())
 }
 
 func props(els ...any) []any {
