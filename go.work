@@ -2,3 +2,5 @@ go 1.20
 
 use ./
 use ./builder
+use ./controller
+use ./service

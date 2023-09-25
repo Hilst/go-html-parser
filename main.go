@@ -3,24 +3,18 @@ package main
 import (
 	"log"
 
-	"github.com/Hilst/go-ui-html-template/builder"
+	bld "github.com/Hilst/go-ui-html-template/builder"
+	ctr "github.com/Hilst/go-ui-html-template/controller"
+	srv "github.com/Hilst/go-ui-html-template/service"
 )
 
 func main() {
-	// DECLARE SERVICE
-	service := Service{
-		dataPath:   "./mocks/",
-		layoutPath: "./screens/",
-	}
-	// GET DATA
+	service := srv.NewService("./mocks/", "./screens/")
 	data := service.RequestData("zero.json")
-	// GET LAYOUT HTML AS STRING
-	layout := service.RequestLayout("layout-items.html")
-
-	tb := builder.NewBuilder(data, layout)
-	str, err := tb.Build()
+	tb, err := bld.NewBuilder(data)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	println(str)
+	c := ctr.NewController(tb, service)
+	c.Main()
 }

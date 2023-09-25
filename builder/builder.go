@@ -11,17 +11,28 @@ import (
 type JSON = map[string]any
 
 type TemplateBuilder struct {
-	data   JSON
-	layout string
-	all    *html.Template
+	data Data
+	all  *html.Template
 }
 
-func NewBuilder(data JSON, layout string) TemplateBuilder {
-	return TemplateBuilder{
-		data,
-		layout,
+type Data struct {
+	Json JSON
+	Id   string
+}
+
+func NewBuilder(data JSON) (*TemplateBuilder, error) {
+	tb := TemplateBuilder{
+		Data{
+			data,
+			"",
+		},
 		nil,
 	}
+	err := tb.readyAll()
+	if err != nil {
+		return nil, err
+	}
+	return &tb, nil
 }
 
 func (tb *TemplateBuilder) functions() html.FuncMap {
@@ -37,14 +48,13 @@ func (tb *TemplateBuilder) functions() html.FuncMap {
 
 func (tb *TemplateBuilder) readyAll() error {
 	parsed, err := html.New("ALL").ParseGlob("./templates/**/*.html")
+	if err != nil {
+		return err
+	}
+	parsed, err = parsed.New("LAYOUTS").Funcs(tb.functions()).ParseGlob("./screens/*.html")
 	if err == nil {
 		tb.all = parsed
 	}
-	return err
-}
-
-func (tb *TemplateBuilder) parseLayout() error {
-	_, err := tb.all.New("LAYOUT").Funcs(tb.functions()).Parse(tb.layout)
 	return err
 }
 
@@ -60,21 +70,10 @@ func (tb *TemplateBuilder) minifyOutput(bf bytes.Buffer) (bytes.Buffer, error) {
 	return *mini, nil
 }
 
-func (tb *TemplateBuilder) Build() (string, error) {
-	var err error
-
-	err = tb.readyAll()
-	if err != nil {
-		return "", err
-	}
-
-	err = tb.parseLayout()
-	if err != nil {
-		return "", err
-	}
-
+func (tb *TemplateBuilder) Build(id string) (string, error) {
+	tb.data.Id = id
 	tmpBf := bytes.NewBuffer([]byte{})
-	err = tb.all.ExecuteTemplate(tmpBf, "MAIN", tb.data)
+	err := tb.all.ExecuteTemplate(tmpBf, "MAIN", tb.data)
 	if err != nil {
 		return "", err
 	}
