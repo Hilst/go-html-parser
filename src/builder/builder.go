@@ -34,7 +34,7 @@ func ready() error {
 		return nil
 	}
 
-	parsed, err := html.New("ALL").Funcs(functions()).ParseGlob("./templates/**/*.html")
+	parsed, err := html.New("ALL").Funcs(functions()).ParseGlob("./res/templates/**/*.html")
 	if err != nil {
 		return err
 	}

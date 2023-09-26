@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	service := srv.NewService("./mocks/", "./screens/")
+	service := srv.NewService("./res/mocks/", "./res/screens/")
 	data := service.RequestData("zero.json")
 	tb, err := bld.NewBuilder(data)
 	if err != nil {

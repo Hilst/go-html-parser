@@ -1,4 +1,5 @@
 #!usr/bin/bash
-output="build/go.ui.html.template.out"
+pwd=$(pwd)
+output="${pwd}/build/go.ui.html.template.out"
 set -x
-go build -o "${output}" && "./${output}"
+go build -C src -o "${output}" && "${output}"

@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 )
 
@@ -20,12 +21,12 @@ func NewService(dataRoot string, layoutRoot string) *Service {
 func (s *Service) RequestData(path string) map[string]any {
 	data, err := os.ReadFile(s.dataRoot + path)
 	if err != nil {
-		panic("CANT READ DATA FILE")
+		log.Fatalln(err.Error())
 	}
 	var result map[string]interface{}
 	err = json.Unmarshal(data, &result)
 	if err != nil {
-		panic("CANT UNMARSHAL DATA")
+		log.Fatalln(err.Error())
 	}
 	return result
 }
