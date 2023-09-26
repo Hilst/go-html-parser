@@ -1,12 +1,7 @@
 {{ define "MAIN" }}
 <body>
     {{ template "HEADER" }}
-    {{ if eq .Id "9ede389a-329b-4110-9d15-f86d31707cf5" }}
-        {{ template "9ede389a-329b-4110-9d15-f86d31707cf5" .Json }}
-    {{ end }}
-    {{ if eq .Id "f68fb80b-94b7-40f2-933b-1c0e32aade8e" }}
-        {{ template "f68fb80b-94b7-40f2-933b-1c0e32aade8e" .Json }}
-    {{ end }}
+    {{ template "LAYOUT" . }}
     {{ template "FOOTER" }}
 </body>
 {{ end }}

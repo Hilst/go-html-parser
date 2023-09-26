@@ -11,31 +11,53 @@ import (
 type JSON = map[string]any
 
 type TemplateBuilder struct {
-	data Data
-	all  *html.Template
+	data JSON
 }
 
-type Data struct {
-	Json JSON
-	Id   string
-}
+var comp *html.Template
 
 func NewBuilder(data JSON) (*TemplateBuilder, error) {
 	tb := TemplateBuilder{
-		Data{
-			data,
-			"",
-		},
-		nil,
+		data,
 	}
-	err := tb.readyAll()
+
+	err := ready()
 	if err != nil {
 		return nil, err
 	}
+
 	return &tb, nil
 }
 
-func (tb *TemplateBuilder) functions() html.FuncMap {
+func ready() error {
+	if comp != nil {
+		return nil
+	}
+
+	parsed, err := html.New("ALL").Funcs(functions()).ParseGlob("./templates/**/*.html")
+	if err != nil {
+		return err
+	}
+
+	comp = parsed
+	return err
+}
+
+func minifyOutput(bf bytes.Buffer) (bytes.Buffer, error) {
+	m := minify.New()
+	m.AddFunc("text/html", minifyHTML.Minify)
+
+	mini := bytes.NewBuffer([]byte{})
+
+	err := m.Minify("text/html", mini, &bf)
+	if err != nil {
+		return bytes.Buffer{}, err
+	}
+
+	return *mini, nil
+}
+
+func functions() html.FuncMap {
 	return html.FuncMap{
 		"props":  props,
 		"get":    get,
@@ -46,39 +68,33 @@ func (tb *TemplateBuilder) functions() html.FuncMap {
 	}
 }
 
-func (tb *TemplateBuilder) readyAll() error {
-	parsed, err := html.New("ALL").ParseGlob("./templates/**/*.html")
-	if err != nil {
-		return err
+func (tb *TemplateBuilder) Build(layout string) (string, error) {
+	if comp == nil {
+		if err := ready(); err != nil {
+			return "", err
+		}
 	}
-	parsed, err = parsed.New("LAYOUTS").Funcs(tb.functions()).ParseGlob("./screens/*.html")
-	if err == nil {
-		tb.all = parsed
-	}
-	return err
-}
 
-func (tb *TemplateBuilder) minifyOutput(bf bytes.Buffer) (bytes.Buffer, error) {
-	const mimetype = "text/html"
-	m := minify.New()
-	m.AddFunc(mimetype, minifyHTML.Minify)
-	mini := bytes.NewBuffer([]byte{})
-	err := m.Minify(mimetype, mini, &bf)
+	clone, err := comp.Clone()
 	if err != nil {
-		return bytes.Buffer{}, err
+		return "", err
 	}
-	return *mini, nil
-}
-
-func (tb *TemplateBuilder) Build(id string) (string, error) {
-	tb.data.Id = id
-	tmpBf := bytes.NewBuffer([]byte{})
-	err := tb.all.ExecuteTemplate(tmpBf, "MAIN", tb.data)
+	tmpl, err := clone.New("LAYOUT").Funcs(functions()).Parse(layout)
 	if err != nil {
 		return "", err
 	}
 
-	mini, err := tb.minifyOutput(*tmpBf)
+	if err != nil {
+		return "", err
+	}
+
+	tmpBf := bytes.NewBuffer([]byte{})
+	err = tmpl.ExecuteTemplate(tmpBf, "MAIN", tb.data)
+	if err != nil {
+		return "", err
+	}
+
+	mini, err := minifyOutput(*tmpBf)
 	if err != nil {
 		return "", err
 	}

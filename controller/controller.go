@@ -25,7 +25,8 @@ func (c *Controller) Main() {
 
 	router.GET("/layout/:layoutname", func(ctx *gin.Context) {
 		layoutName := ctx.Param("layoutname")
-		texthtml, err := c.builder.Build(layoutName)
+		layout := c.service.RequestLayout(layoutName + ".html")
+		texthtml, err := c.builder.Build(layout)
 		if err != nil {
 			ctx.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
 			return
