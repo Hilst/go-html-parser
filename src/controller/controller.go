@@ -13,6 +13,11 @@ type Controller struct {
 	service *s.Service
 }
 
+type LayoutResponse struct {
+	LayoutsHtmls []string `json:"layouts_htmls"`
+	Errors       []error  `json:"errors_list"`
+}
+
 func NewController(builder *b.TemplateBuilder, service *s.Service) *Controller {
 	return &Controller{
 		builder,
@@ -20,20 +25,39 @@ func NewController(builder *b.TemplateBuilder, service *s.Service) *Controller {
 	}
 }
 
+func (c *Controller) layout_Playoutname(ctx *gin.Context) {
+	layoutName := ctx.Param("layoutname")
+	layouts := c.service.RequestLayout(layoutName)
+	htmls, errs := c.builder.Build(layouts)
+	status := http.StatusOK
+	ne := numberErrors(errs)
+	if ne > 0 && ne < len(layouts) {
+		status = http.StatusPartialContent
+	}
+	if ne == len(layouts) {
+		status = http.StatusNotFound
+	}
+	response := LayoutResponse{
+		LayoutsHtmls: htmls,
+		Errors:       errs,
+	}
+	ctx.JSON(status, response)
+}
+
+func numberErrors(errs []error) int {
+	r := 0
+	for _, v := range errs {
+		if v == nil {
+			r++
+		}
+	}
+	return len(errs) - r
+}
+
 func (c *Controller) Main() {
 	router := gin.Default()
 
-	router.GET("/layout/:layoutname", func(ctx *gin.Context) {
-		layoutName := ctx.Param("layoutname")
-		layout := c.service.RequestLayout(layoutName + ".html")
-		texthtml, err := c.builder.Build(layout)
-		if err != nil {
-			ctx.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
-			return
-		}
-
-		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(texthtml))
-	})
+	router.GET("/layout/:layoutname", c.layout_Playoutname)
 
 	router.Run(":8080")
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type Service struct {
@@ -31,11 +32,27 @@ func (s *Service) RequestData(path string) map[string]any {
 	return result
 }
 
-func (s *Service) RequestLayout(layoutName string) string {
-	data, err := os.ReadFile(s.layoutRoot + layoutName)
+func (s *Service) RequestLayout(layoutName string) []string {
+	abs, err := filepath.Abs(filepath.Join(s.layoutRoot, layoutName))
 	if err != nil {
-		panic("CANT READ LAYOUT FILE")
+		log.Fatalln(err.Error())
 	}
-	layout := string(data)
-	return layout
+	dir, err := os.ReadDir(abs)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	out := make([]string, 0)
+	for _, file := range dir {
+		if file.IsDir() {
+			continue
+		}
+
+		data, err := os.ReadFile(filepath.Join(abs, file.Name()))
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+		out = append(out, string(data))
+	}
+	return out
 }
