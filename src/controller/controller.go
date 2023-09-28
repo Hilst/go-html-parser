@@ -33,7 +33,7 @@ func NewController(builder *b.TemplateBuilder, service *s.Service) *Controller {
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 	layoutName := ctx.Param("layoutname")
 	layouts := c.service.RequestLayout(layoutName)
-	data := c.service.RequestData("zero.json")
+	data := c.service.RequestData("total.json")
 	htmls, errs := c.builder.Build(layouts, data)
 	status := http.StatusOK
 	readyStatus(&status, errs, len(layouts))

@@ -1,0 +1,46 @@
+<h1>User Profile</h1>
+<h2>Personal Information</h2>
+<!--date mask-->
+<p><strong>Last Alteration Date:</strong> {{ get "/last_alteration_date" . | string }}</p>
+<p><strong>Sex:</strong> {{ get "/personal_data/sex" . | string }}</p>
+<p><strong>Nationality:</strong> {{ get "/personal_data/nationality" . | string }}</p>
+<p><strong>City:</strong> {{ get "/personal_data/city" . | string }}</p>
+<p><strong>State:</strong> {{ get "/personal_data/state" . | string }}</p>
+<p><strong>Marital Status:</strong> {{ get "/personal_data/marital_status" . | string }}</p>
+
+<h2>Contact Information</h2>
+{{ if $phones := get "/phones" . }}
+    {{ range array $phones }}
+        <p><strong>{{ get "/type" . | string }} Phone:</strong> +{{ get "/national_code" . | string }}({{ get "/regional_code" . | string }}){{ get "/number" . | string | mask "#####-####" }}</p>
+    {{ end }}
+{{ else }}
+    <h3>No Phone Recorded</h3>
+{{ end }}
+<p><strong>Email:</strong> {{ get "/email" . | string }}</p>
+
+<h2>Addresses</h2>
+{{ if $add := get "/addresses" . }}
+    {{ range array $add }}
+        <p><strong>{{ get "/type" . | string }} Address:</strong> {{ get "/street" . | string }}, {{ get "/city" . | string }}, {{ get "/state" . | string }}, {{ get "/postal_code" . | string | mask "#####-###" }}</p>
+    {{ end }}
+{{ else }}
+    <h3>No Address Recorded</h3>
+{{ end }}
+
+<h2>Work Information</h2>
+<p><strong>Company Name:</strong> {{ get "/work_data/company_name" . | string }}</p>
+<p><strong>Company ID:</strong> {{ get "/work_data/company_id" . | string | mask "##.###.###/####-##" }}</p>
+<p><strong>Work Area:</strong> {{ get "/work_data/work_area" . | string }}</p>
+
+<h2>Monetary Information</h2>
+<!--currency mask-->
+<p><strong>Patrimony:</strong> {{ get "/monetary_data/patrimony" . | string }}</p>
+<!--currency mask-->
+<p><strong>Income:</strong> {{ get "/monetary_data/income" . | string }}</p>
+
+<h2>ID Information</h2>
+<p><strong>ID Number:</strong> {{ get "/id_info/id_number" . | string | mask "###.###.###-##" }}</p>
+<!--date mask-->
+<p><strong>Emission Date:</strong> {{ get "/id_info/emission_date" . | string }}</p>
+<p><strong>Mother's Name:</strong> {{ get "/id_info/mother_name" . | string }}</p>
+<p><strong>Father's Name:</strong> {{ get "/id_info/father_name" . | string }}</p>
