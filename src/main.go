@@ -10,8 +10,7 @@ import (
 
 func main() {
 	service := srv.NewService("./res/mocks/", "./res/screens/")
-	data := service.RequestData("zero.json")
-	tb, err := bld.NewBuilder(data)
+	tb, err := bld.NewBuilder()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

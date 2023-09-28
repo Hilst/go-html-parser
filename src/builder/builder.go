@@ -8,20 +8,13 @@ import (
 	minifyHTML "github.com/tdewolff/minify/v2/html"
 )
 
-type JSON = map[string]any
-
-type TemplateBuilder struct {
-	data JSON
-}
+type TemplateBuilder struct{}
 
 var comp *html.Template
 var m *minify.M
 
-func NewBuilder(data JSON) (*TemplateBuilder, error) {
-	tb := TemplateBuilder{
-		data,
-	}
-
+func NewBuilder() (*TemplateBuilder, error) {
+	tb := TemplateBuilder{}
 	err := ready()
 	if err != nil {
 		return nil, err
@@ -73,7 +66,7 @@ func functions() html.FuncMap {
 	}
 }
 
-func (tb *TemplateBuilder) Build(layouts []string) ([]string, []error) {
+func (tb *TemplateBuilder) Build(layouts []string, data map[string]any) ([]string, []error) {
 	if comp == nil || m == nil {
 		if err := ready(); err != nil {
 			e := make([]error, 1)
@@ -85,7 +78,7 @@ func (tb *TemplateBuilder) Build(layouts []string) ([]string, []error) {
 	output := make([]string, len(layouts))
 	errList := make([]error, len(layouts))
 	for index, layout := range layouts {
-		texthtml, err := tb.buildPage(layout)
+		texthtml, err := tb.buildPage(layout, data)
 		if err != nil {
 			errList[index] = err
 			continue
@@ -95,7 +88,7 @@ func (tb *TemplateBuilder) Build(layouts []string) ([]string, []error) {
 	return output, errList
 }
 
-func (tb *TemplateBuilder) buildPage(layout string) (string, error) {
+func (tb *TemplateBuilder) buildPage(layout string, data map[string]any) (string, error) {
 	clone, err := comp.Clone()
 	if err != nil {
 		return "", err
@@ -105,12 +98,8 @@ func (tb *TemplateBuilder) buildPage(layout string) (string, error) {
 		return "", err
 	}
 
-	if err != nil {
-		return "", err
-	}
-
 	tmpBf := bytes.NewBuffer([]byte{})
-	err = tmpl.ExecuteTemplate(tmpBf, "MAIN", tb.data)
+	err = tmpl.ExecuteTemplate(tmpBf, "MAIN", data)
 	if err != nil {
 		return "", err
 	}
