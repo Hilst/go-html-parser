@@ -1,7 +1,6 @@
 <h1>User Profile</h1>
 <h2>Personal Information</h2>
-<!--date mask-->
-<p><strong>Last Alteration Date:</strong> {{ get "/last_alteration_date" . | string }}</p>
+<p><strong>Last Alteration Date:</strong> {{ get "/last_alteration_date" . | string | timedate "yyyy-MM-ddTHH:mm:ss" | dateformat "dd/MM/yy at hh:mm" }}</p>
 <p><strong>Sex:</strong> {{ get "/personal_data/sex" . | string }}</p>
 <p><strong>Nationality:</strong> {{ get "/personal_data/nationality" . | string }}</p>
 <p><strong>City:</strong> {{ get "/personal_data/city" . | string }}</p>
@@ -40,7 +39,6 @@
 
 <h2>ID Information</h2>
 <p><strong>ID Number:</strong> {{ get "/id_info/id_number" . | string | mask "###.###.###-##" }}</p>
-<!--date mask-->
-<p><strong>Emission Date:</strong> {{ get "/id_info/emission_date" . | string }}</p>
+<p><strong>Emission Date:</strong> {{ get "/id_info/emission_date" . | string | timedate "yyyy-MM-dd" | dateformat "MM/yyyy" }}</p>
 <p><strong>Mother's Name:</strong> {{ get "/id_info/mother_name" . | string }}</p>
 <p><strong>Father's Name:</strong> {{ get "/id_info/father_name" . | string }}</p>

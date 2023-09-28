@@ -6,6 +6,8 @@ import (
 
 	"github.com/tdewolff/minify/v2"
 	minifyHTML "github.com/tdewolff/minify/v2/html"
+
+	fn "github.com/Hilst/go-ui-html-template/builder/functions"
 )
 
 type TemplateBuilder struct{}
@@ -28,7 +30,7 @@ func ready() error {
 		return nil
 	}
 
-	parsed, err := html.New("ALL").Funcs(functions()).ParseGlob("./res/templates/**/*.html")
+	parsed, err := html.New("ALL").Funcs(fn.Map()).ParseGlob("./res/templates/**/*.html")
 	if err != nil {
 		return err
 	}
@@ -53,17 +55,6 @@ func minifyOutput(bf bytes.Buffer) (bytes.Buffer, error) {
 	}
 
 	return *mini, nil
-}
-
-func functions() html.FuncMap {
-	return html.FuncMap{
-		"props":  props,
-		"get":    get,
-		"string": stringfy,
-		"array":  array,
-		"where":  where,
-		"mask":   mask,
-	}
 }
 
 func (tb *TemplateBuilder) Build(layouts []string, data map[string]any) ([]string, []error) {
@@ -93,7 +84,7 @@ func (tb *TemplateBuilder) buildPage(layout string, data map[string]any) (string
 	if err != nil {
 		return "", err
 	}
-	tmpl, err := clone.New("LAYOUT").Funcs(functions()).Parse(layout)
+	tmpl, err := clone.New("LAYOUT").Funcs(fn.Map()).Parse(layout)
 	if err != nil {
 		return "", err
 	}
