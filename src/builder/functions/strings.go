@@ -2,19 +2,10 @@ package functions
 
 import (
 	"fmt"
-	"strconv"
 )
 
 // TYPE ENFORCER
 func stringfy(el any) string {
-	s, sok := el.(string)
-	if sok {
-		return s
-	}
-	f, fok := el.(float64)
-	if fok {
-		return strconv.FormatFloat(f, 'G', -1, 64)
-	}
 	return el.(string)
 }
 

@@ -32,10 +32,8 @@
 <p><strong>Work Area:</strong> {{ get "/work_data/work_area" . | string }}</p>
 
 <h2>Monetary Information</h2>
-<!--currency mask-->
-<p><strong>Patrimony:</strong> {{ get "/monetary_data/patrimony" . | string }}</p>
-<!--currency mask-->
-<p><strong>Income:</strong> {{ get "/monetary_data/income" . | string }}</p>
+<p><strong>Patrimony:</strong> {{ get "/monetary_data/patrimony" . | float | currency "en-US" }}</p>
+<p><strong>Income:</strong> {{ get "/monetary_data/income" . | float | currency "pt-BR" }}</p>
 
 <h2>ID Information</h2>
 <p><strong>ID Number:</strong> {{ get "/id_info/id_number" . | string | mask "###.###.###-##" }}</p>
