@@ -13,6 +13,6 @@ func timedate(f string, s string) time.Time {
 }
 
 // TRANSFORMERS
-func dateformat(f string, dt time.Time) string {
+func dateFormat(f string, dt time.Time) string {
 	return dt.Format(mapDateFormatter(f))
 }

@@ -1,0 +1,39 @@
+{{ define "CHILD_A" }}
+<p>A: {{ . }}</p>
+{{ end }}
+
+{{ define "CHILD_B" }}
+<p>B: {{ . }}</p>
+{{ end }}
+
+{{ define "CHILD_C" }}
+<p>C: {{ . }}</p>
+{{ end }}
+
+{{ define "PARENT_0" }}
+{{ range . }}
+    {{ child . 0 }}
+{{ end }}
+{{ end }}
+
+{{ define "PARENT_1" }}
+{{ range . }}
+    {{ child . 0 }}
+    {{ child . 1 }}
+    {{ child . 2 }}
+{{ end }}
+{{ end }}
+
+<h3>CHILD A + PARENT 0</h3>
+{{ loadchild "CHILD_A" 0 }}
+{{ template "PARENT_0" props "a" "b" "c" }}
+
+<h3>CHILD B + PARENT 0</h3>
+{{ loadchild "CHILD_B" 0 }}
+{{ template "PARENT_0" props "a" "b" "c" }}
+
+<h3>CHILD A + CHILD B + CHILD C PARENT 0</h3>
+{{ loadchild "CHILD_A" 0 }}
+{{ loadchild "CHILD_B" 1 }}
+{{ loadchild "CHILD_C" 2 }}
+{{ template "PARENT_1" props "a" "b" "c" }}

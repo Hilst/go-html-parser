@@ -10,7 +10,9 @@ import (
 	fn "github.com/Hilst/go-ui-html-template/builder/functions"
 )
 
-type TemplateBuilder struct{}
+type TemplateBuilder struct {
+	parsed *html.Template
+}
 
 var comp *html.Template
 var m *minify.M
@@ -21,6 +23,7 @@ func NewBuilder() (*TemplateBuilder, error) {
 	if err != nil {
 		return nil, err
 	}
+	tb.addDepenFuncs()
 
 	return &tb, nil
 }
@@ -39,6 +42,11 @@ func ready() error {
 	m = minify.New()
 	m.AddFunc("text/html", minifyHTML.Minify)
 	return err
+}
+
+func (tb *TemplateBuilder) addDepenFuncs() {
+	fn.Add("child", tb.retrieveChild)
+	fn.Add("loadchild", tb.loadChild)
 }
 
 func minifyOutput(bf bytes.Buffer) (bytes.Buffer, error) {
@@ -85,6 +93,10 @@ func (tb *TemplateBuilder) buildPage(layout string, data map[string]any) (string
 		return "", err
 	}
 	tmpl, err := clone.New("LAYOUT").Funcs(fn.Map()).Parse(layout)
+	if err != nil {
+		return "", err
+	}
+	tb.parsed, err = tmpl.Clone()
 	if err != nil {
 		return "", err
 	}

@@ -17,28 +17,28 @@ func float(el any) float64 {
 }
 
 // FORMATTERS
-func decimalformat(local string, fixed int, el float64) string {
+func decimalFormat(local string, fixed int, el float64) string {
 	decimal := number.Decimal(el, number.Scale(fixed))
-	return _printer(local).Sprintf("%v", decimal)
+	return printer(local).Sprintf("%v", decimal)
 }
 
-func percentformat(local string, fixed int, el float64) string {
+func percentFormat(local string, fixed int, el float64) string {
 	percentage := number.Percent(el, number.Scale(fixed))
-	return _printer(local).Sprintf("%v", percentage)
+	return printer(local).Sprintf("%v", percentage)
 }
 
-func currencyformat(local string, el float64) string {
+func currencyFormat(local string, el float64) string {
 	lang := language.MustParse(local)
 	cur, _ := currency.FromTag(lang)
 	scale, _ := currency.Cash.Rounding(cur)
 	dec := number.Decimal(el, number.Scale(scale))
-	return _printer(local).Sprintf("%v%v", currency.Symbol(cur), dec)
+	return printer(local).Sprintf("%v%v", currency.Symbol(cur), dec)
 }
 
-func numberformat(local string, i int) string {
-	return _printer(local).Sprintf("%d", i)
+func numberFormat(local string, i int) string {
+	return printer(local).Sprintf("%d", i)
 }
 
-func _printer(local string) *message.Printer {
+func printer(local string) *message.Printer {
 	return message.NewPrinter(message.MatchLanguage(local))
 }

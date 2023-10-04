@@ -6,27 +6,33 @@ import (
 	"github.com/qri-io/jsonpointer"
 )
 
+var funcs = html.FuncMap{
+	"array":      array,
+	"currency":   currencyFormat,
+	"dateformat": dateFormat,
+	"decimal":    decimalFormat,
+	"filter":     filter,
+	"first":      first,
+	"float":      float,
+	"get":        get,
+	"integer":    integer,
+	"mask":       mask,
+	"now":        now,
+	"number":     numberFormat,
+	"pad":        pad,
+	"percent":    percentFormat,
+	"props":      props,
+	"split":      split,
+	"string":     stringfy,
+	"timedate":   timedate,
+}
+
 func Map() html.FuncMap {
-	return html.FuncMap{
-		"array":      array,
-		"currency":   currencyformat,
-		"dateformat": dateformat,
-		"decimal":    decimalformat,
-		"filter":     filter,
-		"first":      first,
-		"float":      float,
-		"get":        get,
-		"integer":    integer,
-		"mask":       mask,
-		"now":        now,
-		"number":     numberformat,
-		"pad":        pad,
-		"percent":    percentformat,
-		"props":      props,
-		"split":      split,
-		"string":     stringfy,
-		"timedate":   timedate,
-	}
+	return funcs
+}
+
+func Add(key string, fun any) {
+	funcs[key] = fun
 }
 
 func get(path string, from any) any {
