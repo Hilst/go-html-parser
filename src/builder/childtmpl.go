@@ -35,3 +35,8 @@ func (tb *TemplateBuilder) retrieveChild(data any, index int) html.HTML {
 	}
 	return html.HTML(tmpBf.String())
 }
+
+func clearChildren() html.HTML {
+	children = nil
+	return html.HTML("")
+}

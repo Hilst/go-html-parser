@@ -47,6 +47,7 @@ func ready() error {
 func (tb *TemplateBuilder) addDepenFuncs() {
 	fn.Add("child", tb.retrieveChild)
 	fn.Add("loadchild", tb.loadChild)
+	fn.Add("clearchildren", clearChildren)
 }
 
 func minifyOutput(bf bytes.Buffer) (bytes.Buffer, error) {

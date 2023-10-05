@@ -27,13 +27,15 @@
 <h3>CHILD A + PARENT 0</h3>
 {{ loadchild "CHILD_A" 0 }}
 {{ template "PARENT_0" props "a" "b" "c" }}
-
+{{ clearchildren }}
 <h3>CHILD B + PARENT 0</h3>
 {{ loadchild "CHILD_B" 0 }}
 {{ template "PARENT_0" props "a" "b" "c" }}
+{{ clearchildren }}
 
 <h3>CHILD A + CHILD B + CHILD C PARENT 0</h3>
 {{ loadchild "CHILD_A" 0 }}
 {{ loadchild "CHILD_B" 1 }}
 {{ loadchild "CHILD_C" 2 }}
 {{ template "PARENT_1" props "a" "b" "c" }}
+{{ clearchildren }}
