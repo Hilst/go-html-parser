@@ -1,0 +1,17 @@
+.outer-header {
+    text-align: center;
+    font-style: italic;
+}
+
+.hor-container {
+    display: flex;
+    flex-direction: row;
+    & * {
+        margin: auto;
+    }
+}
+
+.try-message {
+    color: red;
+    font-weight: bold;
+}

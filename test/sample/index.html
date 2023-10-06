@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <title>Sample Page</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <script src="./script.js" type="module"></script>
+  <h1 class="outer-header">SAMPLE</h1>
+  <br>
+  <div class="hor-container">
+    <div>
+      <label for="pages-selector">Select Test Pages</label>
+      <select name="pages-selector" id="pages-selector">
+        <option value="9ede389a-329b-4110-9d15-f86d31707cf5">THREE PAGES</option>
+        <option value="aaa8bf72-9e53-4ff0-b1e9-56099d383e15">CHILD PARENT</option>
+        <option value="ccd110f9-fb3f-4c9b-b4ef-52995e6477b3">MANY INFO</option>
+        <option value="f68fb80b-94b7-40f2-933b-1c0e32aade8e">TEST COMP</option>
+      </select>
+    </div>
+    <div class="hor-container">
+      <button style="margin-right: 2rem;" id="previous-button" disabled>previous</button>
+      <label id="page-number-label">0</label>
+      <button style="margin-left: 2rem;" id="next-button" disabled>next</button>
+    </div>
+    <div>
+      <button id="go-button">GO!</button>
+    </div>
+  </div>
+  <br>
+  <hr>
+  <br>
+  <p class="try-message">TRY PRESSING "GO!"</p>
+  <main>
+  </main>
+</body>
+
+</html>
