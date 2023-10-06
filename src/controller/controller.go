@@ -5,6 +5,7 @@ import (
 
 	b "github.com/Hilst/go-ui-html-template/builder"
 	s "github.com/Hilst/go-ui-html-template/service"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +29,10 @@ func NewController(builder *b.TemplateBuilder, service *s.Service) *Controller {
 		builder,
 		service,
 	}
+}
+
+func (c *Controller) get_index(ctx *gin.Context) {
+	ctx.Data(http.StatusOK, "text/plain", []byte("OK"))
 }
 
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
@@ -66,7 +71,9 @@ func (c *Controller) patch_layout_test(ctx *gin.Context) {
 
 func (c *Controller) Main() {
 	router := gin.Default()
+	router.Use(cors.Default())
 
+	router.GET("/", c.get_index)
 	router.GET("/layout/:layoutname", c.get_layout_layoutname)
 	router.PATCH("/layout/test", c.patch_layout_test)
 
