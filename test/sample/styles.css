@@ -15,3 +15,12 @@
     color: red;
     font-weight: bold;
 }
+
+.red {
+    background-color: red;
+    color: white;
+}
+.blue {
+    background-color: blue;
+    color: white;
+}

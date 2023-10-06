@@ -7,6 +7,7 @@ let nextButton = document.getElementById("next-button")
 let pageNumber = document.getElementById("page-number-label")
 let main = document.getElementsByTagName("main").item(0)
 let tryMessageCollection = document.getElementsByClassName("try-message")
+let freeActions = document.getElementsByClassName("free-action")
 
 class HTMLS {
     items = []
@@ -25,7 +26,7 @@ class HTMLS {
     }
     updateCurrent(index) {
         this.current = index
-        pageNumber.innerHTML = parseInt(index)    
+        pageNumber.innerHTML = parseInt(index)
         if (index == 0) {
             previousButton.disabled = true
         } else {
@@ -44,6 +45,7 @@ class HTMLS {
     sendCurrent() {
         const string = this.items[this.current]
         main.innerHTML = string
+        readyActions()
         changeTryVisibility(false)
     }
 }
@@ -52,7 +54,7 @@ var model
 function changeTryVisibility(shouldSee) {
     for (let i = 0; i < tryMessageCollection.length; i++) {
         const element = tryMessageCollection[i];
-        element.style.visibility = shouldSee ? "visible" : "hidden" 
+        element.style.visibility = shouldSee ? "visible" : "hidden"
     }
 }
 
@@ -80,3 +82,23 @@ previousButton.addEventListener("click", (function (_ev) {
 pageSelector.addEventListener("change", (function (_ev) {
     changeTryVisibility(true)
 }))
+
+function readyActions() {
+    for (let i = 0; i < freeActions.length; i++) {
+        const action = freeActions[i].value.split("::");
+        const name = action.shift()
+        const params = action
+        switch (name) {
+            case "ALERT":
+                freeActions[i].addEventListener("click", free_alert, false)
+                freeActions[i].params = params
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+function free_alert(ev) {
+    alert(ev.currentTarget.params)
+}
