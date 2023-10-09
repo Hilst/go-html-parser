@@ -62,14 +62,21 @@ goButton.addEventListener("click", (function (_ev) {
     const hash = pageSelector.value
     const path = "/layout/" + hash
     const json = JSON.parse(http(path))
-    model = new HTMLS(json["layouts_htmls"], json["errors_list"])
+    if (json["layouts_htmls"] !== undefined) {
+        model = new HTMLS(json["layouts_htmls"], json["errors_list"])
+    } 
 }))
 
 function http(path, method) {
-    var req = new XMLHttpRequest()
-    req.open(method || "GET", URL + path, false)
-    req.send(null)
-    return req.response
+    try {
+        var req = new XMLHttpRequest()
+        req.open(method || "GET", URL + path, false)
+        req.send()
+        return req.response
+    } catch (err) {
+        alert("COULD NOT RECEIVE ANSWER FROM BACKEND")
+        return JSON.stringify(err)
+    }
 }
 
 nextButton.addEventListener("click", (function (_ev) {

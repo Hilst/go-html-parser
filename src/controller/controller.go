@@ -38,7 +38,7 @@ func (c *Controller) get_index(ctx *gin.Context) {
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 	layoutName := ctx.Param("layoutname")
 	layouts := c.service.RequestLayout(layoutName)
-	data := c.service.RequestData("total.json")
+	data := c.service.RequestData(layoutName)
 	htmls, errs := c.builder.Build(layouts, data)
 	status := http.StatusOK
 	readyStatus(&status, errs, len(layouts))
