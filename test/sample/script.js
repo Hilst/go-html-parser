@@ -7,7 +7,6 @@ let nextButton = document.getElementById("next-button")
 let pageNumber = document.getElementById("page-number-label")
 let main = document.getElementsByTagName("main").item(0)
 let tryMessageCollection = document.getElementsByClassName("try-message")
-let freeActions = document.getElementsByClassName("free-action")
 
 class HTMLS {
     items = []
@@ -45,7 +44,7 @@ class HTMLS {
     sendCurrent() {
         const string = this.items[this.current]
         main.innerHTML = string
-        readyActions()
+        sendUpdateEvent()
         changeTryVisibility(false)
     }
 }
@@ -90,22 +89,7 @@ pageSelector.addEventListener("change", (function (_ev) {
     changeTryVisibility(true)
 }))
 
-function readyActions() {
-    for (let i = 0; i < freeActions.length; i++) {
-        const action = freeActions[i].value.split("::");
-        const name = action.shift()
-        const params = action
-        switch (name) {
-            case "ALERT":
-                freeActions[i].addEventListener("click", free_alert, false)
-                freeActions[i].params = params
-                break;
-            default:
-                break;
-        }
-    }
-}
-
-function free_alert(ev) {
-    alert(ev.currentTarget.params)
+function sendUpdateEvent() {
+    const ev = new Event("update")
+    window.dispatchEvent(ev)
 }

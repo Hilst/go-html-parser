@@ -11,7 +11,8 @@ import (
 )
 
 type TemplateBuilder struct {
-	parsed *html.Template
+	parsed         *html.Template
+	originalLayout string
 }
 
 var comp *html.Template
@@ -19,12 +20,11 @@ var m *minify.M
 
 func NewBuilder() (*TemplateBuilder, error) {
 	tb := TemplateBuilder{}
+	tb.addDepenFuncs()
 	err := ready()
 	if err != nil {
 		return nil, err
 	}
-	tb.addDepenFuncs()
-
 	return &tb, nil
 }
 
@@ -48,6 +48,9 @@ func (tb *TemplateBuilder) addDepenFuncs() {
 	fn.Add("child", tb.retrieveChild)
 	fn.Add("loadchild", tb.loadChild)
 	fn.Add("clearchildren", clearChildren)
+	fn.Add("self", func() string {
+		return tb.originalLayout
+	})
 }
 
 func minifyOutput(bf bytes.Buffer) (bytes.Buffer, error) {
@@ -78,6 +81,7 @@ func (tb *TemplateBuilder) Build(layouts []string, data map[string]any) ([]strin
 	output := make([]string, len(layouts))
 	errList := make([]error, len(layouts))
 	for index, layout := range layouts {
+		tb.originalLayout = layout
 		texthtml, err := tb.buildPage(layout, data)
 		if err != nil {
 			errList[index] = err

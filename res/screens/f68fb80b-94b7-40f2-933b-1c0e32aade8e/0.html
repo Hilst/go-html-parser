@@ -1,10 +1,26 @@
+{{ template "ORIGIN" . }}
+
+<style>
+    .primary {
+        color: blue;
+    }
+
+    .secondary {
+        color: green;
+    }
+
+    .cancel {
+        color: red;
+    }
+</style>
+
 {{ if $items := get "/items" . }}
     {{ range array $items }}
         {{ $t := get "/title" . | string }}
         {{ $d := get "/description" . | string }}
         {{ $tp := get "/type" . | string }}
         {{ template "ITEM" props $t $d $tp }}
-    {{ end }}
+{{ end }}
 {{ else }}
     <h2>Could not retrieve items</h2>
 {{ end }}

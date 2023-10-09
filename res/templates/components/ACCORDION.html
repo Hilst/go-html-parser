@@ -1,0 +1,49 @@
+{{ define "ACCORDION" }}
+<style>
+    .accordion {
+        background-color: #eee;
+        color: #444;
+        cursor: pointer;
+        padding: 18px;
+        width: 100%;
+        text-align: left;
+        border: none;
+        outline: none;
+        transition: 0.4s;
+
+        :hover {
+            background-color: #ccc;
+        }
+
+        :after {
+            content: "\02793";
+            font-size: 13px;
+            color: #777;
+            float: right;
+            margin-left: 5px;
+        }
+    }
+
+    .active {
+        background-color: #ccc;
+
+        :after {
+            content: "\02796";
+        }
+    }
+
+    .panel {
+        padding: 0 18px;
+        background-color: white;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-out;
+    }
+</style>
+{{ $name := index . 0 }}
+{{ $data := index . 1 }}
+<button class="accordion">{{ $name }}</button>
+<div class="panel">
+    {{ child $data 0 }}
+</div>
+{{ end }}

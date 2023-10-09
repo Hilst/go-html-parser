@@ -1,0 +1,12 @@
+{{ block "SELFCODE" . }}
+    <code>
+        <pre>{{ self }}</pre>
+    </code>
+{{ end }}
+
+{{ define "ORIGIN" }}
+    {{ if loadchild "SELFCODE" 0 }}
+        {{ template "ACCORDION" props "See Template" . }}
+        {{ clearchildren }}
+    {{ end }}
+{{ end }}
