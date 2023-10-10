@@ -8,6 +8,8 @@ require (
 	github.com/tdewolff/minify/v2 v2.12.9
 )
 
+require github.com/google/uuid v1.3.1 // indirect
+
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect

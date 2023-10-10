@@ -3,6 +3,7 @@ package functions
 import (
 	html "html/template"
 
+	"github.com/google/uuid"
 	"github.com/qri-io/jsonpointer"
 )
 
@@ -25,6 +26,7 @@ var funcs = html.FuncMap{
 	"split":      split,
 	"string":     stringfy,
 	"timedate":   timedate,
+	"uuid":       genuuid,
 }
 
 func Map() html.FuncMap {
@@ -44,4 +46,8 @@ func get(path string, from any) any {
 		}
 	}
 	return nil
+}
+
+func genuuid() string {
+	return uuid.NewString()
 }

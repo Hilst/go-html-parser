@@ -6,7 +6,7 @@
 
 {{ define "ORIGIN" }}
     {{ if loadchild "SELFCODE" 0 }}
-        {{ template "ACCORDION" props "See Template" . }}
+        {{ template "ACCORDION" props "See Template" . false }}
         {{ clearchildren }}
     {{ end }}
 {{ end }}
