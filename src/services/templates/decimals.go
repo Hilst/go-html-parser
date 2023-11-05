@@ -1,4 +1,4 @@
-package functions
+package templates
 
 import (
 	"golang.org/x/text/currency"

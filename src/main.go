@@ -1,19 +1,17 @@
 package main
 
 import (
-	"log"
-
-	bld "github.com/Hilst/go-ui-html-template/builder"
 	ctr "github.com/Hilst/go-ui-html-template/controller"
-	srv "github.com/Hilst/go-ui-html-template/service"
+	srv "github.com/Hilst/go-ui-html-template/services"
+	tmp "github.com/Hilst/go-ui-html-template/services/templates"
 )
 
 func main() {
 	service := srv.NewService("./res/mocks/", "./res/screens/")
-	tb, err := bld.NewBuilder()
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	c := ctr.NewController(tb, service)
+
+	ts := tmp.NewTemplateService()
+	ts.Ready()
+
+	c := ctr.NewController(service, ts)
 	c.Main()
 }

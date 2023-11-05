@@ -1,4 +1,4 @@
-package functions
+package templates
 
 import (
 	html "html/template"
@@ -29,11 +29,11 @@ var funcs = html.FuncMap{
 	"uuid":       genuuid,
 }
 
-func Map() html.FuncMap {
+func FuncMap() html.FuncMap {
 	return funcs
 }
 
-func Add(key string, fun any) {
+func AddFunction(key string, fun any) {
 	funcs[key] = fun
 }
 

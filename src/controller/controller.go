@@ -1,22 +1,24 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
-	b "github.com/Hilst/go-ui-html-template/builder"
-	s "github.com/Hilst/go-ui-html-template/service"
+	s "github.com/Hilst/go-ui-html-template/services"
+	t "github.com/Hilst/go-ui-html-template/services/templates"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	m "github.com/tdewolff/minify/v2"
+	mHTML "github.com/tdewolff/minify/v2/html"
 )
 
 type Controller struct {
-	builder *b.TemplateBuilder
 	service *s.Service
-}
-
-type LayoutResponse struct {
-	LayoutsHtmls []string `json:"layouts_htmls"`
-	Errors       []error  `json:"errors_list"`
+	ts      *t.TemplateService
+	m       *m.M
 }
 
 type TestRequest struct {
@@ -24,10 +26,13 @@ type TestRequest struct {
 	Data       map[string]any `json:"data"`
 }
 
-func NewController(builder *b.TemplateBuilder, service *s.Service) *Controller {
+func NewController(service *s.Service, ts *t.TemplateService) *Controller {
+	m := m.New()
+	m.AddFunc("text/html", mHTML.Minify)
 	return &Controller{
-		builder,
 		service,
+		ts,
+		m,
 	}
 }
 
@@ -36,46 +41,42 @@ func (c *Controller) get_index(ctx *gin.Context) {
 }
 
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
-	layoutName := ctx.Param("layoutname")
+	layoutName := ctx.Param(c.clearVariablePath(nameVariablePath))
 	layouts := c.service.RequestLayout(layoutName)
+
 	data := c.service.RequestData(layoutName)
-	htmls, errs := c.builder.Build(layouts, data)
-	status := http.StatusOK
-	readyStatus(&status, errs, len(layouts))
-	response := LayoutResponse{
-		LayoutsHtmls: htmls,
-		Errors:       errs,
+
+	var builder strings.Builder
+	for _, layout := range layouts {
+		builder.WriteString(fmt.Sprintf("<div id=\"page_%s\">%s</div>", layout.Name, layout.Tmpl))
 	}
-	ctx.JSON(status, response)
+	combinedLayout := builder.String()
+
+	c.ts.ParseLayout(combinedLayout)
+	ctx.HTML(http.StatusOK, "MAIN", data)
 }
 
 func (c *Controller) patch_layout_test(ctx *gin.Context) {
 	var body *TestRequest
-	err := ctx.ShouldBindJSON(&body)
-	if err != nil {
-		ctx.Data(http.StatusInternalServerError, "text/plain", []byte(err.Error()))
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-
-	htmls, errs := c.builder.Build([]string{body.LayoutHTML}, body.Data)
-	if len(htmls) != 1 && len(errs) != 1 {
-		ctx.Data(http.StatusInternalServerError, "", []byte{})
-	}
-	status := http.StatusOK
-	readyStatus(&status, errs, 1)
-	if status == http.StatusOK {
-		ctx.Data(status, "text/html", []byte(htmls[0]))
-	} else {
-		ctx.Data(status, "text/plain", []byte(errs[0].Error()))
-	}
+	c.ts.ParseLayout(body.LayoutHTML)
+	ctx.HTML(http.StatusOK, "MAIN", body.Data)
 }
 
 func (c *Controller) Main() {
 	router := gin.Default()
 	router.Use(cors.Default())
+	router.Use(gin.Recovery())
 
-	router.GET("/", c.get_index)
-	router.GET("/layout/:layoutname", c.get_layout_layoutname)
-	router.PATCH("/layout/test", c.patch_layout_test)
+	router.SetHTMLTemplate(c.ts.GetTemplate())
+	router.Use(c.ginMinifyHTML())
+
+	router.GET(c.generatePath(), c.get_index)
+	router.GET(c.generatePath(layoutPath, nameVariablePath), c.get_layout_layoutname)
+	router.PATCH(c.generatePath(layoutPath, testPath), c.patch_layout_test)
 
 	router.Run(":8080")
 }

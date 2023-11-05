@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Service struct {
@@ -35,16 +36,21 @@ func (s *Service) RequestData(id string) map[string]any {
 
 func pathForId(id string) string {
 	switch id {
-	case "ccd110f9-fb3f-4c9b-b4ef-52995e6477b3":
+	case "big":
 		return "total.json"
-	case "f68fb80b-94b7-40f2-933b-1c0e32aade8e":
+	case "comp":
 		return "zero.json"
 	default:
 		return "data.json"
 	}
 }
 
-func (s *Service) RequestLayout(layoutName string) []string {
+type LayoutResponse struct {
+	Tmpl string
+	Name string
+}
+
+func (s *Service) RequestLayout(layoutName string) []LayoutResponse {
 	abs, err := filepath.Abs(filepath.Join(s.layoutRoot, layoutName))
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -54,17 +60,25 @@ func (s *Service) RequestLayout(layoutName string) []string {
 		log.Fatalln(err.Error())
 	}
 
-	out := make([]string, 0)
+	out := make([]LayoutResponse, 0)
+	var name string
 	for _, file := range dir {
 		if file.IsDir() {
 			continue
 		}
 
-		data, err := os.ReadFile(filepath.Join(abs, file.Name()))
+		name = file.Name()
+		data, err := os.ReadFile(filepath.Join(abs, name))
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
-		out = append(out, string(data))
+
+		name = strings.Replace(name, ".html", "", -1)
+		layoutResponse := LayoutResponse{
+			Tmpl: string(data),
+			Name: name,
+		}
+		out = append(out, layoutResponse)
 	}
 	return out
 }
