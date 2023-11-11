@@ -30,14 +30,14 @@ func NewController(service *s.Service, ts *t.TemplateService) *Controller {
 }
 
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
-	layoutName := ctx.Param(c.clearVariablePath(nameVariablePath))
+	layoutName := ctx.Query("name")
 	layouts := c.service.RequestLayout(layoutName)
 
 	data := c.service.RequestData(layoutName)
 
 	var builder strings.Builder
 	for _, layout := range layouts {
-		builder.WriteString(fmt.Sprintf("<div id=\"page_%s\">\n%s\n</div>", layout.Name, layout.Tmpl))
+		builder.WriteString(fmt.Sprintf("<div id=\"page_%s\">\n%s\n</div>\n", layout.Name, layout.Tmpl))
 	}
 	combinedLayout := builder.String()
 
@@ -64,7 +64,7 @@ func (c *Controller) Main() {
 	router.StaticFile("/", "./res/static/index.html")
 	router.StaticFS("static", http.Dir("./res/static/"))
 
-	router.GET(c.generatePath(layoutPath, nameVariablePath), c.get_layout_layoutname)
+	router.GET(c.generatePath(layoutPath), c.get_layout_layoutname)
 	router.PATCH(c.generatePath(layoutPath, testPath), c.patch_layout_test)
 
 	router.Run(":8080")

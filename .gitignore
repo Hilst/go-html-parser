@@ -1,3 +1,5 @@
 .DS_Store
 build/
 .vscode
+pre_cmd.txt
+post_cmd.txt

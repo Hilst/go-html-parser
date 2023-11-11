@@ -1,0 +1,10 @@
+{{ define "BUTTON" }}
+{{ $class := index . 0 }}
+{{ $function := index . 1 }}
+{{ $value := index . 2 }}
+{{ $text := index . 3 }}
+<button
+    class="{{ $class }}"
+    hx-on="click: {{ $function }}({{ $value }})"
+>{{ $text }}</button>
+{{ end }}

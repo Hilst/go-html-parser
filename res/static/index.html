@@ -4,18 +4,27 @@
 <head>
   <title>Sample Page</title>
   <meta charset="utf-8">
-  <link rel="stylesheet" href="static/styles.css"/>
-  <script src="static/script.js" type="module"></script>
+  <link rel="stylesheet" href="static/styles.css" />
   <script src="static/actions-support.js" type="module"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.8"
+    integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr"
+    crossorigin="anonymous">
+  </script>
 </head>
 
 <body>
   <h1 class="outer-header">SAMPLE</h1>
   <br>
-  <div class="hor-container">
+  <div class="centered-container">
     <div>
       <label for="pages-selector">Select Test Pages</label>
-      <select name="pages-selector" id="pages-selector">
+      <select
+        name="name"
+        id="pages-selector"
+        hx-trigger="change"
+        hx-get="/layout"
+        hx-target="#main"
+      >
         <option value="multipage">THREE PAGES</option>
         <option value="children-parent">CHILD PARENT</option>
         <option value="big">MANY INFO</option>
@@ -23,21 +32,14 @@
         <option value="buttons">JS ALLERT</option>
       </select>
     </div>
-    <div class="hor-container">
-      <button style="margin-right: 2rem;" id="previous-button" disabled>previous</button>
-      <label id="page-number-label">0</label>
-      <button style="margin-left: 2rem;" id="next-button" disabled>next</button>
-    </div>
-    <div>
-      <button id="go-button">GO!</button>
-    </div>
   </div>
   <br>
   <hr>
   <br>
-  <p class="try-message">TRY PRESSING "GO!"</p>
-  <main>
-    <!-- WILL BE OVERWRITTEN -->
+  <main id="main">
+    <div class="centered-container">
+      <p class="select-message">SELECT A PAGE</p>
+    </div>
   </main>
 </body>
 
