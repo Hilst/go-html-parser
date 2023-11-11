@@ -10,15 +10,11 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-
-	m "github.com/tdewolff/minify/v2"
-	mHTML "github.com/tdewolff/minify/v2/html"
 )
 
 type Controller struct {
 	service *s.Service
 	ts      *t.TemplateService
-	m       *m.M
 }
 
 type TestRequest struct {
@@ -27,17 +23,10 @@ type TestRequest struct {
 }
 
 func NewController(service *s.Service, ts *t.TemplateService) *Controller {
-	m := m.New()
-	m.AddFunc("text/html", mHTML.Minify)
 	return &Controller{
 		service,
 		ts,
-		m,
 	}
-}
-
-func (c *Controller) get_index(ctx *gin.Context) {
-	ctx.Data(http.StatusOK, "text/plain", []byte("OK"))
 }
 
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
@@ -48,7 +37,7 @@ func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 
 	var builder strings.Builder
 	for _, layout := range layouts {
-		builder.WriteString(fmt.Sprintf("<div id=\"page_%s\">%s</div>", layout.Name, layout.Tmpl))
+		builder.WriteString(fmt.Sprintf("<div id=\"page_%s\">\n%s\n</div>", layout.Name, layout.Tmpl))
 	}
 	combinedLayout := builder.String()
 
@@ -72,9 +61,9 @@ func (c *Controller) Main() {
 	router.Use(gin.Recovery())
 
 	router.SetHTMLTemplate(c.ts.GetTemplate())
-	router.Use(c.ginMinifyHTML())
+	router.StaticFile("/", "./res/static/index.html")
+	router.StaticFS("static", http.Dir("./res/static/"))
 
-	router.GET(c.generatePath(), c.get_index)
 	router.GET(c.generatePath(layoutPath, nameVariablePath), c.get_layout_layoutname)
 	router.PATCH(c.generatePath(layoutPath, testPath), c.patch_layout_test)
 

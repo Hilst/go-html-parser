@@ -1,3 +1,12 @@
+.__acc_tab__content {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.__acc_tab input:checked~.__acc_tab__content {
+    max-height: 100%;
+}
+
 .outer-header {
     text-align: center;
     font-style: italic;

@@ -3,16 +3,6 @@
 {{ $name := index . 0 }}
 {{ $data := index . 1 }}
 {{ $default := index . 2 }}
-<style>
-    .__acc_tab__content {
-        max-height: 0;
-        overflow: hidden;
-    }
-
-    .__acc_tab input:checked~.__acc_tab__content {
-        max-height: 100%;
-    }
-</style>
 <section class="__acc__">
     <div class="__acc_tab">
         <input type="checkbox" name="__acc__-{{ $id }}" id="cb{{ $id }}" {{ if $default }}checked{{ end }}>

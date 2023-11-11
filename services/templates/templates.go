@@ -25,11 +25,12 @@ func (ts *TemplateService) addInternalFuncs() {
 	AddFunction("child", ts.Retrieve)
 	AddFunction("loadchild", ts.Load)
 	AddFunction("clearchildren", Restart)
-	AddFunction("self", func() html.HTML { return html.HTML(ts.entryLayout) })
+	AddFunction("self", func() string { return ts.entryLayout })
 }
 
 func (ts *TemplateService) parseALL() {
 	ts.parsed = html.Must(html.New("ALL").Funcs(FuncMap()).ParseGlob("./res/templates/**/*.html"))
+	println(ts.parsed.DefinedTemplates())
 }
 
 func (ts *TemplateService) ParseLayout(layoutTemplate string) {
