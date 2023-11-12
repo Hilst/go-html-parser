@@ -36,8 +36,16 @@ func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 	data := c.service.RequestData(layoutName)
 
 	var builder strings.Builder
-	for _, layout := range layouts {
-		builder.WriteString(fmt.Sprintf("<div id=\"page_%s\">\n%s\n</div>\n", layout.Name, layout.Tmpl))
+	var hiddenNotation string
+	var s string
+	for i, layout := range layouts {
+		if i == 0 {
+			hiddenNotation = ""
+		} else {
+			hiddenNotation = "hidden"
+		}
+		s = fmt.Sprintf("<div id=\"page_%s\" %s>\n%s\n</div>\n", layout.Name, hiddenNotation, layout.Tmpl)
+		builder.WriteString(s)
 	}
 	combinedLayout := builder.String()
 

@@ -1,1 +1,21 @@
+{{ template "ORIGIN" . }}
+
 <p>CONTENT</p>
+
+{{-
+    template "BUTTON"
+    props
+    "page-changer"
+    "pagechange"
+    "'1', '0'"
+    "PREVIOUS PAGE"
+-}}
+<span> page 1 </span>
+{{-
+    template "BUTTON"
+    props
+    "page-changer"
+    "pagechange"
+    "'1', '2'"
+    "NEXT PAGE"
+-}}
