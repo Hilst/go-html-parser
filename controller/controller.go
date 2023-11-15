@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	s "github.com/Hilst/go-ui-html-template/services"
@@ -10,11 +11,21 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	adapter "github.com/gwatts/gin-adapter"
+	mini "github.com/tdewolff/minify/v2"
+	miniCSS "github.com/tdewolff/minify/v2/css"
+	miniHTML "github.com/tdewolff/minify/v2/html"
+	miniJS "github.com/tdewolff/minify/v2/js"
+	miniJSON "github.com/tdewolff/minify/v2/json"
+	miniSVG "github.com/tdewolff/minify/v2/svg"
+	miniXML "github.com/tdewolff/minify/v2/xml"
 )
 
 type Controller struct {
 	service *s.Service
 	ts      *t.TemplateService
+	m       *mini.M
 }
 
 type TestRequest struct {
@@ -26,7 +37,19 @@ func NewController(service *s.Service, ts *t.TemplateService) *Controller {
 	return &Controller{
 		service,
 		ts,
+		minifyNew(),
 	}
+}
+
+func minifyNew() *mini.M {
+	m := mini.New()
+	m.AddFunc("text/css", miniCSS.Minify)
+	m.AddFunc("text/html", miniHTML.Minify)
+	m.AddFunc("image/svg+xml", miniSVG.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("^(application|text)/(x-)?(java|ecma)script$"), miniJS.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]json$"), miniJSON.Minify)
+	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), miniXML.Minify)
+	return m
 }
 
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
@@ -67,6 +90,7 @@ func (c *Controller) Main() {
 	router := gin.Default()
 	router.Use(cors.Default())
 	router.Use(gin.Recovery())
+	router.Use(adapter.Wrap(c.m.Middleware))
 
 	router.SetHTMLTemplate(c.ts.GetTemplate())
 	router.StaticFile("/", "./res/static/index.html")

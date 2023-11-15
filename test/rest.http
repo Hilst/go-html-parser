@@ -15,7 +15,7 @@ GET {{fullhost}}/layout?name=big HTTP/1.1
 GET {{fullhost}}/layout?name=comp HTTP/1.1
 
 ### TEST HTML
-PATCH {{fullhost}}/layout?name=test HTTP/1.1
+PATCH {{fullhost}}/layout/test HTTP/1.1
 Content-Type: application/json
 
 {
