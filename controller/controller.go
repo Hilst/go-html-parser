@@ -68,6 +68,7 @@ func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 	i := 0
 	for layout := range layoutch {
 		if layout.Error != nil {
+			ctx.HTML(http.StatusNotFound, "404.html", layout.Error.Error())
 			return
 		}
 		if i == 0 {
