@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	mdl "github.com/Hilst/go-ui-html-template/models"
 	s "github.com/Hilst/go-ui-html-template/services"
 	t "github.com/Hilst/go-ui-html-template/services/templates"
 
@@ -54,26 +55,34 @@ func minifyNew() *mini.M {
 
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 	layoutName := ctx.Query("name")
-	layouts := c.service.RequestLayout(layoutName)
 
-	data := c.service.RequestData(layoutName)
+	layoutch := make(chan mdl.LayoutResponse)
+	go c.service.RequestLayout(layoutName, layoutch)
+
+	datach := make(chan mdl.DataResponse, 1)
+	go c.service.RequestData(layoutName, datach)
 
 	var builder strings.Builder
 	var hiddenNotation string
 	var s string
-	for i, layout := range layouts {
+	i := 0
+	for layout := range layoutch {
+		if layout.Error != nil {
+			return
+		}
 		if i == 0 {
 			hiddenNotation = ""
 		} else {
 			hiddenNotation = "hidden"
 		}
-		s = fmt.Sprintf("<div id=\"page_%s\" %s>\n%s\n</div>\n", layout.Name, hiddenNotation, layout.Tmpl)
+		s = fmt.Sprintf("<div id=\"page_%s\" %s>\n%s\n</div>\n", layout.Ok.Name, hiddenNotation, layout.Ok.Tmpl)
 		builder.WriteString(s)
+		i++
 	}
 	combinedLayout := builder.String()
 
 	c.ts.ParseLayout(combinedLayout)
-	ctx.HTML(http.StatusOK, "MAIN", data)
+	ctx.HTML(http.StatusOK, "MAIN", <-datach)
 }
 
 func (c *Controller) patch_layout_test(ctx *gin.Context) {

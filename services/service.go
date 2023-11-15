@@ -2,10 +2,11 @@ package service
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	mdl "github.com/Hilst/go-ui-html-template/models"
 )
 
 type Service struct {
@@ -20,18 +21,17 @@ func NewService(dataRoot string, layoutRoot string) *Service {
 	}
 }
 
-func (s *Service) RequestData(id string) map[string]any {
+func (s *Service) RequestData(id string, ch chan mdl.DataResponse) {
+	defer close(ch)
 	path := pathForId(id)
 	data, err := os.ReadFile(s.dataRoot + path)
 	if err != nil {
-		log.Fatalln(err.Error())
+		ch <- mdl.NewDataResp(nil, err)
+		return
 	}
 	var result map[string]interface{}
 	err = json.Unmarshal(data, &result)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	return result
+	ch <- mdl.NewDataResp(result, err)
 }
 
 func pathForId(id string) string {
@@ -45,22 +45,19 @@ func pathForId(id string) string {
 	}
 }
 
-type LayoutResponse struct {
-	Tmpl string
-	Name string
-}
-
-func (s *Service) RequestLayout(layoutName string) []LayoutResponse {
+func (s *Service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {
+	defer close(ch)
 	abs, err := filepath.Abs(filepath.Join(s.layoutRoot, layoutName))
 	if err != nil {
-		log.Fatalln(err.Error())
+		ch <- mdl.NewLayoutRespError(err)
+		return
 	}
 	dir, err := os.ReadDir(abs)
 	if err != nil {
-		log.Fatalln(err.Error())
+		ch <- mdl.NewLayoutRespError(err)
+		return
 	}
 
-	out := make([]LayoutResponse, 0)
 	var name string
 	for _, file := range dir {
 		if file.IsDir() {
@@ -70,15 +67,11 @@ func (s *Service) RequestLayout(layoutName string) []LayoutResponse {
 		name = file.Name()
 		data, err := os.ReadFile(filepath.Join(abs, name))
 		if err != nil {
-			log.Fatalln(err.Error())
+			ch <- mdl.NewLayoutRespError(err)
+			return
 		}
 
 		name = strings.Replace(name, ".html", "", -1)
-		layoutResponse := LayoutResponse{
-			Tmpl: string(data),
-			Name: name,
-		}
-		out = append(out, layoutResponse)
+		ch <- mdl.NewLayoutResp(string(data), name)
 	}
-	return out
 }

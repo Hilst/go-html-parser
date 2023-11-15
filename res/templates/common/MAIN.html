@@ -1,3 +1,6 @@
 {{ define "MAIN" }}
-    {{ template "LAYOUT" . }}
+    {{ if eq .Error nil }}
+        <div>OK</div>
+        {{ template "LAYOUT" .Ok }}
+    {{ end }}
 {{ end }}
