@@ -1,6 +1,6 @@
 {{ define "MAIN" }}
     {{ if eq .Error nil }}
-        {{ template "LAYOUT" .Ok }}
+        {{ template "LAYOUT" .Ok.Data }}
     {{ else }}
         <div>ERROR</div>
         <p>{{ .Error }}</p>

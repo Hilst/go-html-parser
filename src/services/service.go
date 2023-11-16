@@ -21,28 +21,14 @@ func NewService(dataRoot string, layoutRoot string) *Service {
 	}
 }
 
-func (s *Service) RequestData(id string, ch chan mdl.DataResponse) {
-	defer close(ch)
-	path := pathForId(id)
-	data, err := os.ReadFile(s.dataRoot + path)
+func (s *Service) RequestData(id string) mdl.DataResponse {
+	data, err := os.ReadFile(s.dataRoot + id + ".json")
 	if err != nil {
-		ch <- mdl.NewDataResp(nil, err)
-		return
+		return mdl.NewDataRespError(err)
 	}
-	var result map[string]any
+	var result mdl.MiddleDataResp
 	err = json.Unmarshal(data, &result)
-	ch <- mdl.NewDataResp(result, err)
-}
-
-func pathForId(id string) string {
-	switch id {
-	case "big":
-		return "total.json"
-	case "comp":
-		return "zero.json"
-	default:
-		return "data.json"
-	}
+	return mdl.NewDataResp(result, err)
 }
 
 func (s *Service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {

@@ -21,11 +21,13 @@ const (
 func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 	layoutName := ctx.Query(nameQuery)
 
-	layoutch := make(chan mdl.LayoutResponse)
-	go c.service.RequestLayout(layoutName, layoutch)
+	dataresp := c.service.RequestData(layoutName)
+	if dataresp.Error != nil {
+		ctx.HTML(http.StatusBadRequest, "404.html", dataresp.Error)
+	}
 
-	datach := make(chan mdl.DataResponse, 1)
-	go c.service.RequestData(layoutName, datach)
+	layoutch := make(chan mdl.LayoutResponse)
+	go c.service.RequestLayout(dataresp.Ok.LayoutRoot, layoutch)
 
 	var builder strings.Builder
 	var hiddenNotation string
@@ -48,16 +50,11 @@ func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 	combinedLayout := builder.String()
 
 	c.ts.ParseLayout(combinedLayout)
-	ctx.HTML(http.StatusOK, mainTmpl, <-datach)
-}
-
-type TestRequest struct {
-	LayoutHTML string `form:"html"`
-	Data       string `form:"data"`
+	ctx.HTML(http.StatusOK, mainTmpl, dataresp)
 }
 
 func (c *Controller) patch_layout_test(ctx *gin.Context) {
-	var body TestRequest
+	var body mdl.TestRequest
 	if err := ctx.ShouldBind(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -65,5 +62,5 @@ func (c *Controller) patch_layout_test(ctx *gin.Context) {
 	var data map[string]any
 	err := json.Unmarshal([]byte(body.Data), &data)
 	c.ts.ParseLayout(body.LayoutHTML)
-	ctx.HTML(http.StatusOK, mainTmpl, mdl.NewDataResp(data, err))
+	ctx.HTML(http.StatusOK, mainTmpl, mdl.NewDataRespFree(data, err))
 }
