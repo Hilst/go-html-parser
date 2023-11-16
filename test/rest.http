@@ -16,19 +16,7 @@ GET {{fullhost}}/layout?name=comp HTTP/1.1
 
 ### TEST HTML
 PATCH {{fullhost}}/layout/test HTTP/1.1
-Content-Type: application/json
+Content-Type: application/x-www-form-urlencoded
 
-{
- "html": "{{ $a := get \"/a\" . | string }}{{ $b := get \"/b\" . | array }}<h1>{{ $a }}</h1>{{ range array $b }}<span>{{ . }}</span>{{ end }}{{ $c := get \"/c/c1\" . | float | currency \"pt-BR\" }}<p>{{ $c }}</p><span>{{ get \"/d\" . | integer }}</span>",
- "data": {
-     "a": "A",
-     "b": [
-         "b1",
-         "b2"
-     ],
-     "c": {
-         "c1": 45.0
-     },
-     "d": 1
- }
-}
+html={{ $a := get "/a" . | string }}{{ $b := get "/b" . | array }}<h1>{{ $a }}</h1>{{ range array $b }}<span>{{ . }}</span>{{ end }}{{ $c := get "/c/c1" . | float | currency "pt-BR" }}<p>{{ $c }}</p><span>{{ get "/d" . | integer }}</span>
+&data={ "a": "A", "b": [ "b1", "b2" ], "c": {"c1": 45.0}, "d": 1}
