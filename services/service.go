@@ -29,7 +29,7 @@ func (s *Service) RequestData(id string, ch chan mdl.DataResponse) {
 		ch <- mdl.NewDataResp(nil, err)
 		return
 	}
-	var result map[string]interface{}
+	var result map[string]any
 	err = json.Unmarshal(data, &result)
 	ch <- mdl.NewDataResp(result, err)
 }

@@ -5,6 +5,8 @@ type routesPaths string
 const (
 	layoutPath routesPaths = "layout"
 	testPath   routesPaths = "test"
+	tabPath    routesPaths = "tabs"
+	samplePath routesPaths = "sample"
 )
 
 func (c *Controller) generatePath(paths ...routesPaths) string {

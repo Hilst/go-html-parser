@@ -1,0 +1,15 @@
+<form hx-patch="/layout/test" hx-target="#result-prompt" class="vertical-form">
+    <label for="data">JSON DATA</label>
+    <textarea rows="10" cols="70" name="data">{ "a": "A" }</textarea>
+    <br>
+    <label for="data">HTML LAYOUT</label>
+    <textarea rows="10" cols="70" name="html">{{"<p>{{ get \"/a\" . | string }}</p>"}}</textarea>
+    <br>
+    <button type="submit" class="submit-button">FORM TEST</button>
+</form>
+<br>
+<hr>
+<br>
+<div id="result-prompt">
+    <h3>TRY THE FORM TO SUBSTITUTE THIS</h3>
+</div>

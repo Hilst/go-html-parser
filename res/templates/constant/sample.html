@@ -1,0 +1,13 @@
+<div>
+    <label for="pages-selector">Select Sample Pages</label>
+    <select name="name" id="pages-selector" hx-trigger="load, change" hx-get="/layout" hx-target="#sample">
+        <option value="multipage">THREE PAGES</option>
+        <option value="children-parent">CHILD PARENT</option>
+        <option value="big">MANY INFO</option>
+        <option value="comp">TEST COMP</option>
+        <option value="buttons">JS ALLERT</option>
+    </select>
+</div>
+<br>
+<br>
+<div id="sample"></div>

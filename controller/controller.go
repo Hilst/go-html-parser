@@ -1,12 +1,9 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
-	"strings"
 
-	mdl "github.com/Hilst/go-ui-html-template/models"
 	s "github.com/Hilst/go-ui-html-template/services"
 	t "github.com/Hilst/go-ui-html-template/services/templates"
 
@@ -29,11 +26,6 @@ type Controller struct {
 	m       *mini.M
 }
 
-type TestRequest struct {
-	LayoutHTML string         `json:"html"`
-	Data       map[string]any `json:"data"`
-}
-
 func NewController(service *s.Service, ts *t.TemplateService) *Controller {
 	return &Controller{
 		service,
@@ -53,49 +45,6 @@ func minifyNew() *mini.M {
 	return m
 }
 
-func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
-	layoutName := ctx.Query("name")
-
-	layoutch := make(chan mdl.LayoutResponse)
-	go c.service.RequestLayout(layoutName, layoutch)
-
-	datach := make(chan mdl.DataResponse, 1)
-	go c.service.RequestData(layoutName, datach)
-
-	var builder strings.Builder
-	var hiddenNotation string
-	var s string
-	i := 0
-	for layout := range layoutch {
-		if layout.Error != nil {
-			ctx.HTML(http.StatusNotFound, "404.html", layout.Error.Error())
-			return
-		}
-		if i == 0 {
-			hiddenNotation = ""
-		} else {
-			hiddenNotation = "hidden"
-		}
-		s = fmt.Sprintf("<div id=\"page_%s\" %s>\n%s\n</div>\n", layout.Ok.Name, hiddenNotation, layout.Ok.Tmpl)
-		builder.WriteString(s)
-		i++
-	}
-	combinedLayout := builder.String()
-
-	c.ts.ParseLayout(combinedLayout)
-	ctx.HTML(http.StatusOK, "MAIN", <-datach)
-}
-
-func (c *Controller) patch_layout_test(ctx *gin.Context) {
-	var body *TestRequest
-	if err := ctx.ShouldBindJSON(&body); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.ts.ParseLayout(body.LayoutHTML)
-	ctx.HTML(http.StatusOK, "MAIN", body.Data)
-}
-
 func (c *Controller) Main() {
 	router := gin.Default()
 	router.Use(cors.Default())
@@ -108,6 +57,8 @@ func (c *Controller) Main() {
 
 	router.GET(c.generatePath(layoutPath), c.get_layout_layoutname)
 	router.PATCH(c.generatePath(layoutPath, testPath), c.patch_layout_test)
+	router.GET(c.generatePath(tabPath, samplePath), c.get_tab_sample)
+	router.GET(c.generatePath(tabPath, testPath), c.get_tab_test)
 
 	router.Run(":8080")
 }
