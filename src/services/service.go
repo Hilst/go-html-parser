@@ -1,33 +1,41 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 
 	mdl "github.com/Hilst/go-ui-html-template/models"
+	"github.com/redis/go-redis/v9"
 )
 
 type Service struct {
-	dataRoot   string
+	redis      redis.Client
 	layoutRoot string
 }
 
-func NewService(dataRoot string, layoutRoot string) *Service {
+func NewService(layoutRoot string) *Service {
+	rClient := redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       0,
+	})
 	return &Service{
-		dataRoot,
+		*rClient,
 		layoutRoot,
 	}
 }
 
 func (s *Service) RequestData(id string) mdl.DataResponse {
-	data, err := os.ReadFile(s.dataRoot + id + ".json")
+	ctx := context.Background()
+	val, err := s.redis.Get(ctx, id).Result()
 	if err != nil {
 		return mdl.NewDataRespError(err)
 	}
 	var result mdl.MiddleDataResp
-	err = json.Unmarshal(data, &result)
+	err = json.Unmarshal([]byte(val), &result)
 	return mdl.NewDataResp(result, err)
 }
 

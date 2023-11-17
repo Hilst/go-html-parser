@@ -23,7 +23,8 @@ func (c *Controller) get_layout_layoutname(ctx *gin.Context) {
 
 	dataresp := c.service.RequestData(layoutName)
 	if dataresp.Error != nil {
-		ctx.HTML(http.StatusBadRequest, "404.html", dataresp.Error)
+		ctx.HTML(http.StatusNotFound, notFoundTmpl, dataresp.Error.Error())
+		return
 	}
 
 	layoutch := make(chan mdl.LayoutResponse)

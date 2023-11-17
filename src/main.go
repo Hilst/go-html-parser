@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	service := srv.NewService("./res/mocks/", "./res/screens/")
+	service := srv.NewService("./res/screens/")
 
 	ts := tmp.NewTemplateService()
 	ts.Ready()
