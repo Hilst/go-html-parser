@@ -4,3 +4,4 @@ build/
 pre_cmd.txt
 post_cmd.txt
 tmp/
+minio/data

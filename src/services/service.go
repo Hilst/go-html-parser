@@ -3,11 +3,15 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"os"
-	"path/filepath"
+	"errors"
 	"strings"
 
 	mdl "github.com/Hilst/go-ui-html-template/models"
+	"github.com/aws/aws-sdk-go/aws"
+	awsCred "github.com/aws/aws-sdk-go/aws/credentials"
+	awsSession "github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -22,6 +26,7 @@ func NewService(layoutRoot string) *Service {
 		Password: "",
 		DB:       0,
 	})
+
 	return &Service{
 		*rClient,
 		layoutRoot,
@@ -39,33 +44,55 @@ func (s *Service) RequestData(id string) mdl.DataResponse {
 	return mdl.NewDataResp(result, err)
 }
 
+var s3Config = &aws.Config{
+	Credentials:      awsCred.NewStaticCredentials("root", "password", ""),
+	Endpoint:         aws.String("127.0.0.1:9000"),
+	Region:           aws.String("us-east-1"),
+	DisableSSL:       aws.Bool(true),
+	S3ForcePathStyle: aws.Bool(true),
+}
+
 func (s *Service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {
 	defer close(ch)
-	abs, err := filepath.Abs(filepath.Join(s.layoutRoot, layoutName))
-	if err != nil {
-		ch <- mdl.NewLayoutRespError(err)
+
+	session, sessionErr := awsSession.NewSession(s3Config)
+	if sessionErr != nil {
+		ch <- mdl.NewLayoutRespError(sessionErr)
 		return
 	}
-	dir, err := os.ReadDir(abs)
-	if err != nil {
-		ch <- mdl.NewLayoutRespError(err)
+	s3Client := s3.New(session)
+	listObjsInput := &s3.ListObjectsV2Input{
+		Bucket: aws.String("screens"),
+		Prefix: aws.String(layoutName),
+	}
+	listObjsResult, listObjsError := s3Client.ListObjectsV2(listObjsInput)
+	if listObjsError != nil {
+		ch <- mdl.NewLayoutRespError(listObjsError)
+		return
+	}
+	if *listObjsResult.KeyCount == 0 {
+		ch <- mdl.NewLayoutRespError(errors.New("empty content"))
 		return
 	}
 
-	var name string
-	for _, file := range dir {
-		if file.IsDir() {
-			continue
+	downloader := s3manager.NewDownloader(session)
+	var buff *aws.WriteAtBuffer
+	var getObjInput *s3.GetObjectInput
+	var fileName string
+	for _, object := range listObjsResult.Contents {
+		buff = aws.NewWriteAtBuffer([]byte{})
+		getObjInput = &s3.GetObjectInput{
+			Bucket: aws.String("screens"),
+			Key:    object.Key,
 		}
-
-		name = file.Name()
-		data, err := os.ReadFile(filepath.Join(abs, name))
+		_, err := downloader.Download(buff, getObjInput)
 		if err != nil {
 			ch <- mdl.NewLayoutRespError(err)
 			return
 		}
-
-		name = strings.Replace(name, ".html", "", -1)
-		ch <- mdl.NewLayoutResp(string(data), name)
+		fileName = *object.Key
+		fileName = strings.Split(fileName, "/")[1]
+		fileName = strings.Trim(fileName, ".html")
+		ch <- mdl.NewLayoutResp(string(buff.Bytes()), fileName)
 	}
 }
