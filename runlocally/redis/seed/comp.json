@@ -1,0 +1,23 @@
+{
+    "name": "comp",
+    "layout": "comp",
+    "data": {
+        "items": [
+            {
+                "title": "A",
+                "description": "a",
+                "type": "primary"
+            },
+            {
+                "title": "B",
+                "description": "b",
+                "type": "secondary"
+            },
+            {
+                "title": "C",
+                "description": "c",
+                "type": "cancel"
+            }
+        ]
+    }
+}

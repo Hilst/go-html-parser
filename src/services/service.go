@@ -23,7 +23,7 @@ type Service struct {
 func NewService(layoutRoot string) *Service {
 	rClient := redis.NewClient(&redis.Options{
 		Addr:     "127.0.0.1:6379",
-		Password: "",
+		Password: "41b51c8446b802cc442d87ec8e766b6a306afbc35556c2a942ad37fb",
 		DB:       0,
 	})
 
