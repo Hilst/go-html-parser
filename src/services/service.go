@@ -29,15 +29,25 @@ func NewService(layoutRoot string) *Service {
 	}
 }
 
-func (s *Service) RequestData(id string) mdl.DataResponse {
-	ctx := context.Background()
-	val, err := s.redis.Get(ctx, id).Result()
-	if err != nil {
-		return mdl.NewDataRespError(err)
-	}
+func (s *Service) RequestData(id string, ch chan mdl.DataResponse) {
+	defer close(ch)
 	var result mdl.MiddleDataResp
-	err = json.Unmarshal([]byte(val), &result)
-	return mdl.NewDataResp(result, err)
+	val, ok := s.makeRedisGet(id, ch)
+	if !ok {
+		return
+	}
+	err := json.Unmarshal([]byte(val), &result)
+	ch <- mdl.NewDataResp(result, err)
+}
+
+func (s *Service) makeRedisGet(id string, ch chan mdl.DataResponse) ([]byte, bool) {
+	ctx := context.Background()
+	val, err := s.redis.Get(ctx, id).Bytes()
+	if err != nil {
+		ch <- mdl.NewDataRespError(err)
+		return []byte{}, false
+	}
+	return val, true
 }
 
 func (s *Service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {
