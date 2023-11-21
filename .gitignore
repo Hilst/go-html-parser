@@ -7,3 +7,4 @@ tmp/
 runlocally/start.sh
 runlocally/minio/data
 runlocally/__pycache__
+.localenv

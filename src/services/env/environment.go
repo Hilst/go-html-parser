@@ -21,6 +21,7 @@ const (
 
 func getEnv(key string) string {
 	if value, ok := os.LookupEnv(key); ok {
+		println(key, value)
 		return value
 	}
 	println("NO ENV VAR: " + key)

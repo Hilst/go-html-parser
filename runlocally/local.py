@@ -1,6 +1,5 @@
 import subprocess
 import time
-import sys
 
 import minio_screens
 import redis_seed
@@ -32,10 +31,7 @@ def main():
 
     time.sleep(3)
 
-    if not "--no-redis-seed" in sys.argv:
-        redis_seed.redis_main()
-
-    if not "--no-minio-screens" in sys.argv:
-        minio_screens.minio_main()
+    redis_seed.redis_main()
+    minio_screens.minio_main()
 
 main()

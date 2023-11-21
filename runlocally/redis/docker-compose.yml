@@ -9,3 +9,8 @@ services:
     environment:
       REDIS_PASS: ${REDIS_PASS}
     command: redis-server --save 60 1 --requirepass ${REDIS_PASS}
+    networks:
+      - net
+networks:
+  net:
+    driver: bridge
