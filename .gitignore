@@ -4,7 +4,9 @@ build/
 pre_cmd.txt
 post_cmd.txt
 tmp/
-runlocally/start.sh
+runlocally/redis/.redisenv
+runlocally/minio/data
+runlocally/minio/.minioenv
 runlocally/minio/data
 runlocally/__pycache__
 .localenv

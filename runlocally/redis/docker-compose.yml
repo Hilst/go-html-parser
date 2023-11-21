@@ -6,9 +6,12 @@ services:
     restart: always
     ports:
       - 6379:6379
-    environment:
-      REDIS_PASS: ${REDIS_PASS}
-    command: redis-server --save 60 1 --requirepass ${REDIS_PASS}
+    env_file:
+      - .redisenv
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --requirepass "$${REDIS_PASS:? REDIS_PASS not set}"
     networks:
       - net
 networks:

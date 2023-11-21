@@ -2,12 +2,15 @@ import json
 import redis
 import os
 
+import util
+
 def make_redis_client() -> redis.client:
+    redis_env = util.read_env_file("./redis/.redisenv")
     return redis.Redis(host="localhost",
                        port=6379,
                        db=0,
                        decode_responses=True,
-                       password=os.getenv("REDIS_PASS"))
+                       password=redis_env["REDIS_PASS"])
 
 def read_json_files() -> dict[str, str]:
    files = {}

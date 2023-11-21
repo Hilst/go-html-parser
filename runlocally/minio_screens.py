@@ -2,11 +2,14 @@ import json
 from minio import Minio
 import os
 
+import util
+
 def make_minio_client() -> Minio:
+    minio_env = util.read_env_file("./minio/.minioenv")
     return Minio(endpoint="localhost:9000",
                  secure=False,
-                 access_key=os.getenv("MINIO_ROOT_USER"),
-                 secret_key=os.getenv("MINIO_ROOT_PASSWORD"))
+                 access_key=minio_env["MINIO_ROOT_USER"],
+                 secret_key=minio_env["MINIO_ROOT_PASSWORD"])
 
 def check_buckets(m: Minio):
     if not m.bucket_exists("screens"):
