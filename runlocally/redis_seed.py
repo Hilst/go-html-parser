@@ -7,7 +7,7 @@ def make_redis_client() -> redis.client:
                        port=6379,
                        db=0,
                        decode_responses=True,
-                       password="41b51c8446b802cc442d87ec8e766b6a306afbc35556c2a942ad37fb")
+                       password=os.getenv("REDIS_PASS"))
 
 def read_json_files() -> dict[str, str]:
    files = {}

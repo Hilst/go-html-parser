@@ -5,7 +5,6 @@ import sys
 import minio_screens
 import redis_seed
 
-
 def run_docker_compose(composition: str) -> bool:
     try:
         subprocess.check_call([
@@ -26,8 +25,10 @@ def main():
     minio_ok = run_docker_compose("minio")
     if not redis_ok:
         print("Something wrong with Redis")
+        return
     if not minio_ok:
         print("Something wrong with Minio")
+        return
 
     time.sleep(3)
 

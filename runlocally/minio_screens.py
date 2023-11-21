@@ -5,8 +5,8 @@ import os
 def make_minio_client() -> Minio:
     return Minio(endpoint="localhost:9000",
                  secure=False,
-                 access_key="root",
-                 secret_key="password")
+                 access_key=os.getenv("MINIO_ROOT_USER"),
+                 secret_key=os.getenv("MINIO_ROOT_PASSWORD"))
 
 def check_buckets(m: Minio):
     if not m.bucket_exists("screens"):

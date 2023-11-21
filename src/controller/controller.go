@@ -7,10 +7,10 @@ import (
 	s "github.com/Hilst/go-ui-html-template/services"
 	t "github.com/Hilst/go-ui-html-template/services/templates"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	adapter "github.com/gwatts/gin-adapter"
+
 	mini "github.com/tdewolff/minify/v2"
 	miniCSS "github.com/tdewolff/minify/v2/css"
 	miniHTML "github.com/tdewolff/minify/v2/html"
@@ -47,7 +47,6 @@ func minifyNew() *mini.M {
 
 func (c *Controller) Main() {
 	router := gin.Default()
-	router.Use(cors.Default())
 	router.Use(gin.Recovery())
 	router.Use(adapter.Wrap(c.m.Middleware))
 
@@ -55,8 +54,11 @@ func (c *Controller) Main() {
 	router.StaticFile("/", "./res/static/index.html")
 	router.StaticFS("static", http.Dir("./res/static/"))
 
+	// FUNCTIONAL ENDPOINTS
 	router.GET(c.generatePath(layoutPath), c.get_layout_layoutname)
 	router.PATCH(c.generatePath(layoutPath, testPath), c.patch_layout_test)
+
+	// WEB PAGE ENDPOINTS
 	router.GET(c.generatePath(tabPath, samplePath), c.get_tab_sample)
 	router.GET(c.generatePath(tabPath, testPath), c.get_tab_test)
 

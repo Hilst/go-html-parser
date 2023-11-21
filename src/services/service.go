@@ -7,29 +7,25 @@ import (
 	"strings"
 
 	mdl "github.com/Hilst/go-ui-html-template/models"
+	"github.com/Hilst/go-ui-html-template/services/env"
+
 	"github.com/aws/aws-sdk-go/aws"
-	awsCred "github.com/aws/aws-sdk-go/aws/credentials"
 	awsSession "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+
 	"github.com/redis/go-redis/v9"
 )
 
 type Service struct {
-	redis      redis.Client
-	layoutRoot string
+	redis     *redis.Client
+	awsConfig *aws.Config
 }
 
 func NewService(layoutRoot string) *Service {
-	rClient := redis.NewClient(&redis.Options{
-		Addr:     "127.0.0.1:6379",
-		Password: "41b51c8446b802cc442d87ec8e766b6a306afbc35556c2a942ad37fb",
-		DB:       0,
-	})
-
 	return &Service{
-		*rClient,
-		layoutRoot,
+		env.NewRedisClient(),
+		env.NewAwsConfig(),
 	}
 }
 
@@ -44,55 +40,66 @@ func (s *Service) RequestData(id string) mdl.DataResponse {
 	return mdl.NewDataResp(result, err)
 }
 
-var s3Config = &aws.Config{
-	Credentials:      awsCred.NewStaticCredentials("root", "password", ""),
-	Endpoint:         aws.String("127.0.0.1:9000"),
-	Region:           aws.String("us-east-1"),
-	DisableSSL:       aws.Bool(true),
-	S3ForcePathStyle: aws.Bool(true),
-}
-
 func (s *Service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {
 	defer close(ch)
-
-	session, sessionErr := awsSession.NewSession(s3Config)
-	if sessionErr != nil {
-		ch <- mdl.NewLayoutRespError(sessionErr)
+	session, ok := s.makeNewAWSSession(ch)
+	if !ok {
 		return
 	}
 	s3Client := s3.New(session)
-	listObjsInput := &s3.ListObjectsV2Input{
-		Bucket: aws.String("screens"),
-		Prefix: aws.String(layoutName),
+	listObjsResult, ok := s.listS3Objects("screens", layoutName, s3Client, ch)
+	if !ok {
+		return
 	}
-	listObjsResult, listObjsError := s3Client.ListObjectsV2(listObjsInput)
+	downloader := s3manager.NewDownloader(session)
+	s.downloadS3Objs(downloader, listObjsResult, "screens", ch)
+}
+
+func (s *Service) makeNewAWSSession(ch chan mdl.LayoutResponse) (*awsSession.Session, bool) {
+	if session, err := awsSession.NewSession(s.awsConfig); err == nil {
+		return session, true
+	} else {
+		ch <- mdl.NewLayoutRespError(err)
+		return nil, false
+	}
+}
+
+func (s *Service) listS3Objects(bucket string, prefix string, client *s3.S3, ch chan mdl.LayoutResponse) ([]*s3.Object, bool) {
+	listObjsInput := &s3.ListObjectsV2Input{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(prefix),
+	}
+	listObjsResult, listObjsError := client.ListObjectsV2(listObjsInput)
 	if listObjsError != nil {
 		ch <- mdl.NewLayoutRespError(listObjsError)
-		return
+		return nil, false
 	}
 	if *listObjsResult.KeyCount == 0 {
 		ch <- mdl.NewLayoutRespError(errors.New("empty content"))
-		return
+		return nil, false
 	}
+	return listObjsResult.Contents, true
+}
 
-	downloader := s3manager.NewDownloader(session)
+func (s *Service) downloadS3Objs(downloader *s3manager.Downloader, s3Contents []*s3.Object, bucket string, ch chan mdl.LayoutResponse) bool {
 	var buff *aws.WriteAtBuffer
 	var getObjInput *s3.GetObjectInput
 	var fileName string
-	for _, object := range listObjsResult.Contents {
+	for _, object := range s3Contents {
 		buff = aws.NewWriteAtBuffer([]byte{})
 		getObjInput = &s3.GetObjectInput{
-			Bucket: aws.String("screens"),
+			Bucket: aws.String(bucket),
 			Key:    object.Key,
 		}
 		_, err := downloader.Download(buff, getObjInput)
 		if err != nil {
 			ch <- mdl.NewLayoutRespError(err)
-			return
+			return false
 		}
 		fileName = *object.Key
 		fileName = strings.Split(fileName, "/")[1]
 		fileName = strings.Trim(fileName, ".html")
 		ch <- mdl.NewLayoutResp(string(buff.Bytes()), fileName)
 	}
+	return true
 }

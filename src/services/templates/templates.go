@@ -30,7 +30,6 @@ func (ts *TemplateService) addInternalFuncs() {
 
 func (ts *TemplateService) parseALL() {
 	ts.parsed = html.Must(html.New("ALL").Funcs(FuncMap()).ParseGlob("./res/templates/**/*.html"))
-	println(ts.parsed.DefinedTemplates())
 }
 
 func (ts *TemplateService) ParseLayout(layoutTemplate string) {

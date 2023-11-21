@@ -6,5 +6,6 @@ services:
     restart: always
     ports:
       - 6379:6379
-    command: redis-server --save 60 1 --requirepass 41b51c8446b802cc442d87ec8e766b6a306afbc35556c2a942ad37fb
- 
+    environment:
+      REDIS_PASS: ${REDIS_PASS}
+    command: redis-server --save 60 1 --requirepass ${REDIS_PASS}

@@ -4,5 +4,6 @@ build/
 pre_cmd.txt
 post_cmd.txt
 tmp/
+runlocally/start.sh
 runlocally/minio/data
 runlocally/__pycache__
