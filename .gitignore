@@ -8,5 +8,5 @@ runlocally/redis/.redisenv
 runlocally/minio/data
 runlocally/minio/.minioenv
 runlocally/minio/data
-runlocally/__pycache__
+runlocally/scripts/__pycache__
 .localenv

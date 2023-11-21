@@ -14,10 +14,9 @@ def make_minio_client() -> Minio:
 def check_buckets(m: Minio):
     if not m.bucket_exists("screens"):
         m.make_bucket("screens")
-
-    folders = [x for x in os.listdir("minio/screens")]
+    folders = [x for x in os.listdir("./minio/screens")]
     for folder in folders:
-        folder_path = os.path.join("minio/screens", folder)
+        folder_path = os.path.join("minio", "screens", folder)
         for file in os.listdir(folder_path):
             m.fput_object("screens", os.path.join(folder, file), os.path.join(folder_path, file))
 
