@@ -4,7 +4,7 @@ services:
   uihtml:
     build: ./
     env_file:
-      - .localenv
+      - /env/.localenv
     ports:
       - 8080:8080
     networks:

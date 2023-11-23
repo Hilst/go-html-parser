@@ -9,4 +9,4 @@ runlocally/minio/data
 runlocally/minio/.minioenv
 runlocally/minio/data
 runlocally/scripts/__pycache__
-.localenv
+env/
