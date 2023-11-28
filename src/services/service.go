@@ -17,19 +17,31 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type Service struct {
-	redis     *redis.Client
-	awsConfig *aws.Config
+type IService interface {
+	RequestData(id string, ch chan mdl.DataResponse)
+	RequestLayout(layoutName string, ch chan mdl.LayoutResponse)
 }
 
-func NewService(layoutRoot string) *Service {
-	return &Service{
+func NewIService() IService {
+	if mock, isMock := newMock(); isMock {
+		return mock
+	}
+	return newService()
+}
+
+func newService() *service {
+	return &service{
 		env.NewRedisClient(),
 		env.NewAwsConfig(),
 	}
 }
 
-func (s *Service) RequestData(id string, ch chan mdl.DataResponse) {
+type service struct {
+	redis     *redis.Client
+	awsConfig *aws.Config
+}
+
+func (s *service) RequestData(id string, ch chan mdl.DataResponse) {
 	defer close(ch)
 	var result mdl.MiddleDataResp
 	val, ok := s.makeRedisGet(id, ch)
@@ -40,7 +52,7 @@ func (s *Service) RequestData(id string, ch chan mdl.DataResponse) {
 	ch <- mdl.NewDataResp(result, err)
 }
 
-func (s *Service) makeRedisGet(id string, ch chan mdl.DataResponse) ([]byte, bool) {
+func (s *service) makeRedisGet(id string, ch chan mdl.DataResponse) ([]byte, bool) {
 	ctx := context.Background()
 	val, err := s.redis.Get(ctx, id).Bytes()
 	if err != nil {
@@ -50,7 +62,7 @@ func (s *Service) makeRedisGet(id string, ch chan mdl.DataResponse) ([]byte, boo
 	return val, true
 }
 
-func (s *Service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {
+func (s *service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {
 	defer close(ch)
 	session, ok := s.makeNewAWSSession(ch)
 	if !ok {
@@ -65,7 +77,7 @@ func (s *Service) RequestLayout(layoutName string, ch chan mdl.LayoutResponse) {
 	s.downloadS3Objs(downloader, listObjsResult, "screens", ch)
 }
 
-func (s *Service) makeNewAWSSession(ch chan mdl.LayoutResponse) (*awsSession.Session, bool) {
+func (s *service) makeNewAWSSession(ch chan mdl.LayoutResponse) (*awsSession.Session, bool) {
 	if session, err := awsSession.NewSession(s.awsConfig); err == nil {
 		return session, true
 	} else {
@@ -74,7 +86,7 @@ func (s *Service) makeNewAWSSession(ch chan mdl.LayoutResponse) (*awsSession.Ses
 	}
 }
 
-func (s *Service) listS3Objects(bucket string, prefix string, client *s3.S3, ch chan mdl.LayoutResponse) ([]*s3.Object, bool) {
+func (s *service) listS3Objects(bucket string, prefix string, client *s3.S3, ch chan mdl.LayoutResponse) ([]*s3.Object, bool) {
 	listObjsInput := &s3.ListObjectsV2Input{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(prefix),
@@ -91,7 +103,7 @@ func (s *Service) listS3Objects(bucket string, prefix string, client *s3.S3, ch 
 	return listObjsResult.Contents, true
 }
 
-func (s *Service) downloadS3Objs(downloader *s3manager.Downloader, s3Contents []*s3.Object, bucket string, ch chan mdl.LayoutResponse) bool {
+func (s *service) downloadS3Objs(downloader *s3manager.Downloader, s3Contents []*s3.Object, bucket string, ch chan mdl.LayoutResponse) bool {
 	var buff *aws.WriteAtBuffer
 	var getObjInput *s3.GetObjectInput
 	var fileName string

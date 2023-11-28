@@ -17,6 +17,9 @@ const (
 	awsCredSecretKey = "AWS_CRED_SECRET"
 	awsEndpointKey   = "AWS_ENDPOINT"
 	awsRegionKey     = "AWS_REGION"
+
+	mockedStaticsKey = "MOCK_STATICS"
+	mockedJsonsKey   = "MOCK_JSONS"
 )
 
 func getEnv(key string) string {
@@ -46,4 +49,11 @@ func NewAwsConfig() *aws.Config {
 		DisableSSL:       aws.Bool(true),
 		S3ForcePathStyle: aws.Bool(true),
 	}
+}
+
+func MockEnv() (static string, jsons string, isMock bool) {
+	static = getEnv(mockedStaticsKey)
+	jsons = getEnv(mockedJsonsKey)
+	isMock = static != "" && jsons != ""
+	return
 }

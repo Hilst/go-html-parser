@@ -21,12 +21,12 @@ import (
 )
 
 type Controller struct {
-	service *s.Service
+	service s.IService
 	ts      *t.TemplateService
 	m       *mini.M
 }
 
-func NewController(service *s.Service, ts *t.TemplateService) *Controller {
+func NewController(service s.IService, ts *t.TemplateService) *Controller {
 	return &Controller{
 		service,
 		ts,

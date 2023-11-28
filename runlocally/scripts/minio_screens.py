@@ -12,13 +12,15 @@ def make_minio_client() -> Minio:
                  secret_key=minio_env["MINIO_ROOT_PASSWORD"])
 
 def check_buckets(m: Minio):
+    base_path = os.getenv("STATICS")
     if not m.bucket_exists("screens"):
         m.make_bucket("screens")
-    folders = [x for x in os.listdir("./minio/screens")]
+    folders = [x for x in os.listdir(base_path)]
     for folder in folders:
-        folder_path = os.path.join("minio", "screens", folder)
+        folder_path = os.path.join(base_path, folder)
         for file in os.listdir(folder_path):
             m.fput_object("screens", os.path.join(folder, file), os.path.join(folder_path, file))
+            print("put screen", folder, file)
 
 
 def read_only_policy(m: Minio):

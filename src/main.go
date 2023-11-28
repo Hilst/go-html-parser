@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	service := srv.NewService("./res/screens/")
+	service := srv.NewIService()
 
 	ts := tmp.NewTemplateService()
 	ts.Ready()
