@@ -13,6 +13,8 @@ GET {{fullhost}}/layout?name=children-parent HTTP/1.1
 GET {{fullhost}}/layout?name=big HTTP/1.1
 ### COMPONENTS
 GET {{fullhost}}/layout?name=comp HTTP/1.1
+### ERROR RECOVER
+GET {{fullhost}}/layout?name=error-recover HTTP/1.1
 
 ### TEST HTML
 PATCH {{fullhost}}/layout/test HTTP/1.1

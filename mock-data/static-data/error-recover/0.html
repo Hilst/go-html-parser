@@ -1,0 +1,9 @@
+{{ $a := get "/extra/here/maybe" . | string }}
+<p>PASSED A</p>
+{{ $b := get "/extra/here/nothere" . | string }}
+<p>PASSED B</p>
+{{ $c := get "/extra/items" . | array }}
+<p>PASSED C</p>
+{{ $d := get "/extra/notitems" . }}
+{{ $e := array $d }}
+<p>PASSED D AND E</p>

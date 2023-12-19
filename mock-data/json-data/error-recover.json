@@ -1,0 +1,23 @@
+{
+    "name": "error-recover",
+    "layout": "error-recover",
+    "data": {
+        "extra": {
+            "here": {
+                "maybe":"here"
+            },
+            "here2": 123
+        },
+        "items": [
+            {
+                "title": "A"
+            },
+            {
+                "title": "B"
+            },
+            {
+                "title": "C"
+            }
+        ]
+    }
+}
