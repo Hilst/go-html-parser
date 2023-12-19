@@ -15,10 +15,10 @@
 </style>
 
 {{ if $items := get "/items" . }}
-    {{ range array $items }}
-        {{ $t := get "/title" . | string }}
-        {{ $d := get "/description" . | string }}
-        {{ $tp := get "/type" . | string }}
+    {{ range array $items | solvearray }}
+        {{ $t := get "/title" . | string | solvestring }}
+        {{ $d := get "/description" . | string | solvestring }}
+        {{ $tp := get "/type" . | string | solvestring }}
         {{ template "ITEM" props $t $d $tp }}
 {{ end }}
 {{ else }}

@@ -1,43 +1,27 @@
 package templates
 
-import "strings"
+import (
+	opt "github.com/moznion/go-optional"
+)
 
 // GENERATORS
 func props(els ...any) []any {
 	return els
 }
 
-func split(sep string, value string) []string {
-	return strings.Split(value, sep)
-}
-
 // TYPE ENFORCER
-func array(parr any) []any {
-	return parr.([]any)
+func array(parr opt.Option[any]) opt.Option[[]any] {
+	if parr, err := parr.Take(); err == nil {
+		return opt.Some[[]any](parr.([]any))
+	}
+	return opt.None[[]any]()
 }
 
-// REDUCERS
-func first(path string, comp any, array []any) any {
-	var base string
-	for _, item := range array {
-		base = stringfy(get(path, item))
-		comp = stringfy(comp)
-		if base == comp {
-			return item
-		}
-	}
-	return nil
+// VALIDATOR
+func resolveArray(op opt.Option[[]any]) []any {
+	return op.TakeOr([]any{})
 }
 
-func filter(path string, comp any, array []any) []any {
-	res := make([]any, 0)
-	var base string
-	for _, item := range array {
-		base = stringfy(get(path, item))
-		comp = stringfy(comp)
-		if base == comp {
-			res = append(res, item)
-		}
-	}
-	return res
+func emptyArray(a []any) bool {
+	return len(a) == 0
 }

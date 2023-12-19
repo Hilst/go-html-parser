@@ -2,43 +2,45 @@
 
 <h1>User Profile</h1>
 <h2>Personal Information</h2>
-<p><strong>Last Alteration Date:</strong> {{ get "/last_alteration_date" . | string | timedate "yyyy-MM-ddTHH:mm:ss" | dateformat "dd/MM/yy at hh:mm" }}</p>
-<p><strong>Sex:</strong> {{ get "/personal_data/sex" . | string }}</p>
-<p><strong>Nationality:</strong> {{ get "/personal_data/nationality" . | string }}</p>
-<p><strong>City:</strong> {{ get "/personal_data/city" . | string }}</p>
-<p><strong>State:</strong> {{ get "/personal_data/state" . | string }}</p>
-<p><strong>Marital Status:</strong> {{ get "/personal_data/marital_status" . | string }}</p>
+<p><strong>Last Alteration Date:</strong> {{ get "/last_alteration_date" . | string | timedate "yyyy-MM-ddTHH:mm:ss" | dateformat "dd/MM/yy at HH:mm aa" | solvestring }}</p>
+<p><strong>Sex:</strong> {{ get "/personal_data/sex" . | string | solvestring }}</p>
+<p><strong>Nationality:</strong> {{ get "/personal_data/nationality" . | string | solvestring }}</p>
+<p><strong>City:</strong> {{ get "/personal_data/city" . | string | solvestring }}</p>
+<p><strong>State:</strong> {{ get "/personal_data/state" . | string | solvestring }}</p>
+<p><strong>Marital Status:</strong> {{ get "/personal_data/marital_status" . | string | solvestring }}</p>
 
 <h2>Contact Information</h2>
-{{ if $phones := get "/phones" . }}
-    {{ range array $phones }}
-        <p><strong>{{ get "/type" . | string }} Phone:</strong> +{{ get "/national_code" . | string }}({{ get "/regional_code" . | string }}){{ get "/number" . | string | mask "#####-####" }}</p>
+{{ $phones := get "/phones" . | array | solvearray }}
+{{ if emptyarray $phones | not }}
+    {{ range $phones }}
+        <p><strong>{{ get "/type" . | string | solvestring }} Phone:</strong> +{{ get "/national_code" . | string | solvestring }}({{ get "/regional_code" . | string | solvestring }}){{ get "/number" . | string | mask "#####-####" | solvestring }}</p>
     {{ end }}
 {{ else }}
     <h3>No Phone Recorded</h3>
 {{ end }}
-<p><strong>Email:</strong> {{ get "/email" . | string }}</p>
+<p><strong>Email:</strong> {{ get "/email" . | string | solvestring }}</p>
 
 <h2>Addresses</h2>
-{{ if $add := get "/addresses" . }}
-    {{ range array $add }}
-        <p><strong>{{ get "/type" . | string }} Address:</strong> {{ get "/street" . | string }}, {{ get "/city" . | string }}, {{ get "/state" . | string }}, {{ get "/postal_code" . | string | mask "#####-###" }}</p>
+{{ $add := get "/addresses" . | array | solvearray }}
+{{ if emptyarray $add | not }}
+    {{ range $add }}
+        <p><strong>{{ get "/type" . | string | solvestring }} Address:</strong> {{ get "/street" . | string | solvestring }}, {{ get "/city" . | string | solvestring }}, {{ get "/state" . | string | solvestring }}, {{ get "/postal_code" . | string | mask "#####-###" | solvestring }}</p>
     {{ end }}
 {{ else }}
     <h3>No Address Recorded</h3>
 {{ end }}
 
 <h2>Work Information</h2>
-<p><strong>Company Name:</strong> {{ get "/work_data/company_name" . | string }}</p>
-<p><strong>Company ID:</strong> {{ get "/work_data/company_id" . | string | mask "##.###.###/####-##" }}</p>
-<p><strong>Work Area:</strong> {{ get "/work_data/work_area" . | string }}</p>
+<p><strong>Company Name:</strong> {{ get "/work_data/company_name" . | string | solvestring }}</p>
+<p><strong>Company ID:</strong> {{ get "/work_data/company_id" . | string | mask "##.###.###/####-##" | solvestring }}</p>
+<p><strong>Work Area:</strong> {{ get "/work_data/work_area" . | string | solvestring }}</p>
 
 <h2>Monetary Information</h2>
-<p><strong>Patrimony:</strong> {{ get "/monetary_data/patrimony" . | float | currency "en-US" }}</p>
-<p><strong>Income:</strong> {{ get "/monetary_data/income" . | float | currency "pt-BR" }}</p>
+<p><strong>Patrimony:</strong> {{ get "/monetary_data/patrimony" . | float | currency "en-US" | solvestring }}</p>
+<p><strong>Income:</strong> {{ get "/monetary_data/income" . | float | currency "pt-BR" | solvestring }}</p>
 
 <h2>ID Information</h2>
-<p><strong>ID Number:</strong> {{ get "/id_info/id_number" . | string | mask "###.###.###-##" }}</p>
-<p><strong>Emission Date:</strong> {{ get "/id_info/emission_date" . | string | timedate "yyyy-MM-dd" | dateformat "MM/yyyy" }}</p>
-<p><strong>Mother's Name:</strong> {{ get "/id_info/mother_name" . | string }}</p>
-<p><strong>Father's Name:</strong> {{ get "/id_info/father_name" . | string }}</p>
+<p><strong>ID Number:</strong> {{ get "/id_info/id_number" . | string | mask "###.###.###-##" | solvestring }}</p>
+<p><strong>Emission Date:</strong> {{ get "/id_info/emission_date" . | string | timedate "yyyy-MM-dd" | dateformat "MM/yyyy" | solvestring }}</p>
+<p><strong>Mother's Name:</strong> {{ get "/id_info/mother_name" . | string | solvestring }}</p>
+<p><strong>Father's Name:</strong> {{ get "/id_info/father_name" . | string | solvestring }}</p>

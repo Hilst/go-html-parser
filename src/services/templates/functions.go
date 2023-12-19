@@ -4,29 +4,35 @@ import (
 	html "html/template"
 
 	"github.com/google/uuid"
+	opt "github.com/moznion/go-optional"
 	"github.com/qri-io/jsonpointer"
 )
 
 var funcs = html.FuncMap{
+	"get":  get,
+	"uuid": genuuid,
+
 	"array":      array,
-	"currency":   currencyFormat,
-	"dateformat": dateFormat,
-	"decimal":    decimalFormat,
-	"filter":     filter,
-	"first":      first,
-	"float":      float,
-	"get":        get,
-	"integer":    integer,
-	"mask":       mask,
-	"now":        now,
-	"number":     numberFormat,
-	"pad":        pad,
-	"percent":    percentFormat,
 	"props":      props,
-	"split":      split,
-	"string":     stringfy,
+	"solvearray": resolveArray,
+	"emptyarray": emptyArray,
+
+	"integer":  integer,
+	"float":    float,
+	"currency": currencyFormat,
+	"decimal":  decimalFormat,
+	"number":   numberFormat,
+	"percent":  percentFormat,
+
+	"string":        stringfy,
+	"solvestring":   resolveString,
+	"invalidstring": invalidString,
+	"mask":          mask,
+	"pad":           pad,
+
+	"now":        now,
 	"timedate":   timedate,
-	"uuid":       genuuid,
+	"dateformat": dateFormat,
 }
 
 func FuncMap() html.FuncMap {
@@ -37,15 +43,15 @@ func AddFunction(key string, fun any) {
 	funcs[key] = fun
 }
 
-func get(path string, from any) any {
+func get(path string, from any) opt.Option[any] {
 	p, perr := jsonpointer.Parse(path)
 	if perr == nil {
 		c, cerr := p.Eval(from)
-		if cerr == nil {
-			return c
+		if c != nil && cerr == nil {
+			return opt.Some[any](c)
 		}
 	}
-	return nil
+	return opt.None[any]()
 }
 
 func genuuid() string {

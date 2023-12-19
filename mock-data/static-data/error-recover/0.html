@@ -1,9 +1,34 @@
-{{ $a := get "/extra/here/maybe" . | string }}
-<p>PASSED A</p>
-{{ $b := get "/extra/here/nothere" . | string }}
-<p>PASSED B</p>
-{{ $c := get "/extra/items" . | array }}
-<p>PASSED C</p>
-{{ $d := get "/extra/notitems" . }}
-{{ $e := array $d }}
-<p>PASSED D AND E</p>
+{{ template "ORIGIN" . }}
+
+{{ $a := get "/extra/here/maybe" . | string | solvestring }}
+{{ if invalidstring $a }}
+    <p>A INVALID {{ $a }}</p>
+{{ else }}
+    <p>PASSED A WITH: {{ $a }}</p>
+{{ end }}
+
+{{ $b := get "/extra/here/nothere" . | string | solvestring }}
+{{ if invalidstring $b }}
+    <p>B INVALID {{ $b }}</p>
+{{ else }}
+    <p>PASSED B WITH: {{ $b }}</p>
+{{ end }}
+
+{{ $c := get "/items" . | array | solvearray }}
+{{ if emptyarray $c }}
+    <p>C IS EMPTY</p>
+{{ else }}
+    {{ range $index, $value := $c }}
+        <p>PASSED C {{ $index }} WITH: {{ get "/title" $value | string | solvestring }}</p>
+    {{ end }}
+{{ end }}
+
+{{ $d := get "/notitems" . }}
+{{ $e := array $d | solvearray }}
+{{ if emptyarray $e }}
+    <p>E IS EMPTY</p>
+{{ else }}
+    {{ range $index, $value := $d }}
+        <p>PASSED D AND E {{ $index }} WITH: {{ get "/title" $value | string | solvestring }}</p>
+    {{ end }}
+{{ end }}
